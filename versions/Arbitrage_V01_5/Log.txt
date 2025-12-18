@@ -1,0 +1,602 @@
+Microsoft Windows [Version 10.0.26100.7171]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\dasol>cd /d D:\Program_Files\Crypto\HyperLiquid\Arbitrage_V01_5
+
+D:\Program_Files\Crypto\HyperLiquid\Arbitrage_V01_5>python universal_ws_leverage_tester.py
+
+==================================================
+🚀 WebSocket 기반 레버리지 주문 통합 테스트 (Ultra Robust)
+==================================================
+
+00:24:38 - 🔌 거래소 객체 생성 및 연결...
+00:24:39 - ✅ [HL] 초기화 (Vault: 0x06dB..)
+00:24:40 - get_cookie_with_expiration path='https://edge.grvt.io/auth/api_key/login' OK response cookie_value='AN5OOBGUAUF6ARGCYX4332MGQXRHIOZLMACFR3T5HNAOX35OGGTUSXZWGZFL3UHREPGBOIMXFM6OTNHBKZ4NJZBQF5ZI53ODG4CRUUQ' cookie_expiry=datetime.datetime(2025, 12, 10, 15, 24, 40) grvt_account_id='36Nsff3KiPHfnM87mt4vMvpuosU'
+00:24:40 - ✅ [GRVT] 클라이언트 초기화 (SubAcc: 7754890162939536)
+00:24:41 - 📥 마켓 데이터 로딩...
+00:24:41 - ✅ [HL] 222개 심볼 로드 완료
+00:24:41 - ✅ [GRVT] 레버리지 정보 동기화 완료
+00:24:41 - ✅ [GRVT] 75개 심볼 로드 완료
+00:24:42 - ✅ [PAC] 37개 심볼 로드 완료
+00:24:42 - ✅ [LTR] 89개 심볼 로드 완료
+00:24:43 - ✅ [Lighter] 클라이언트 초기화 (Acc:288085)
+00:24:44 - ✅ [EXT] 91개 심볼 로드 완료
+00:24:44 - 📡 WebSocket 연결 및 구독 시작...
+00:24:44 - ⏳ 가격 데이터 수신 대기 중 (10초)...
+00:24:44 - GrvtCcxtBase: self.env=<GrvtEnv.PROD: 'prod'>, self._trading_account_id='7754890162939536'
+00:24:45 - get_cookie_with_expiration path='https://edge.grvt.io/auth/api_key/login' OK response cookie_value='HWELZHXBLQC4CMNIE62GJSIKTSFUADLYYVCDJVHRNAD4V4DAX5SJLDKQXT3JGDIHP2MEN55YZJJXWJJZKT3TO4MRDZPSGZLOOZJZRCY' cookie_expiry=datetime.datetime(2025, 12, 10, 15, 24, 45) grvt_account_id='36Nsff3KiPHfnM87mt4vMvpuosU'
+00:24:45 - update_session_with_cookie self._cookie={'gravity': 'HWELZHXBLQC4CMNIE62GJSIKTSFUADLYYVCDJVHRNAD4V4DAX5SJLDKQXT3JGDIHP2MEN55YZJJXWJJZKT3TO4MRDZPSGZLOOZJZRCY', 'expires': 1765347885.0, 'X-Grvt-Account-Id': '36Nsff3KiPHfnM87mt4vMvpuosU'} self._session.cookie_jar=<aiohttp.cookiejar.CookieJar object at 0x0000012978970770> self._session.headers=<CIMultiDict('Content-Type': 'application/json', 'X-Grvt-Account-Id': '36Nsff3KiPHfnM87mt4vMvpuosU')>
+00:24:45 - GrvtCcxtWS initialized self.api_url={<GrvtWSEndpointType.MARKET_DATA: 'mdg'>: 'wss://market-data.grvt.io/ws', <GrvtWSEndpointType.TRADE_DATA: 'tdg'>: 'wss://trades.grvt.io/ws', <GrvtWSEndpointType.MARKET_DATA_RPC_FULL: 'mdg_rpc_full'>: 'wss://market-data.grvt.io/ws/full', <GrvtWSEndpointType.TRADE_DATA_RPC_FULL: 'tdg_rpc_full'>: 'wss://trades.grvt.io/ws/full'}
+00:24:45 - GrvtCcxtWS initialized self.ws={<GrvtWSEndpointType.MARKET_DATA: 'mdg'>: None, <GrvtWSEndpointType.TRADE_DATA: 'tdg'>: None, <GrvtWSEndpointType.MARKET_DATA_RPC_FULL: 'mdg_rpc_full'>: None, <GrvtWSEndpointType.TRADE_DATA_RPC_FULL: 'tdg_rpc_full'>: None}
+00:24:45 - load_markets START
+00:24:45 - GrvtCcxtWS _auth_and_post path='https://market-data.grvt.io/full/v1/instruments' payload={'kind': [<GrvtInstrumentKind.PERPETUAL: 'PERPETUAL'>], 'limit': 1000, 'is_active': True}
+payload_json='{"kind": ["PERPETUAL"], "limit": 1000, "is_active": true}'
+00:24:45 - GrvtCcxtWS _read_messages mdg connection not open
+00:24:45 - GrvtCcxtWS _read_messages tdg connection not open
+00:24:45 - GrvtCcxtWS _read_messages mdg_rpc_full connection not open
+00:24:45 - GrvtCcxtWS _read_messages tdg_rpc_full connection not open
+00:24:50 - GrvtCcxtWS _read_messages mdg connection not open
+00:24:50 - GrvtCcxtWS _read_messages tdg connection not open
+00:24:50 - GrvtCcxtWS _read_messages mdg_rpc_full connection not open
+00:24:50 - GrvtCcxtWS _read_messages tdg_rpc_full connection not open
+00:24:50 - 💓 [EXT] AVNT Mid: $0.3082
+00:24:50 - 💓 [Pacifica] BTC Mid: $90676.7687
+00:24:50 - 💓 [HL] BTC Mid: $90671.5000
+00:24:52 - GrvtCcxtWS _read_messages mdg connection not open
+00:24:52 - GrvtCcxtWS _read_messages tdg connection not open
+00:24:52 - GrvtCcxtWS _read_messages mdg_rpc_full connection not open
+00:24:52 - GrvtCcxtWS _read_messages tdg_rpc_full connection not open
+00:24:54 - GrvtCcxtWS _read_messages mdg connection not open
+00:24:54 - GrvtCcxtWS _read_messages tdg connection not open
+00:24:54 - GrvtCcxtWS _read_messages mdg_rpc_full connection not open
+00:24:54 - GrvtCcxtWS _read_messages tdg_rpc_full connection not open
+
+💰 [초기 잔고]
+   - HL: Equity $33.92 | Available $33.92
+   - GRVT: Equity $19.53 | Available $19.53
+00:24:55 - GrvtCcxtBase: self.env=<GrvtEnv.PROD: 'prod'>, self._trading_account_id='7754890162939536'
+00:24:56 - get_cookie_with_expiration path='https://edge.grvt.io/auth/api_key/login' OK response cookie_value='HQBWN4NI53EKVX4DNOGFQLTAXBQZJDNKOYYHWVCLEWJQSX67ZEAGQOU2H222AM6L7JKQ6EPMALCGACJKQ4QB5TTCWGIVIZX5GSWPOYY' cookie_expiry=datetime.datetime(2025, 12, 10, 15, 24, 56) grvt_account_id='36Nsff3KiPHfnM87mt4vMvpuosU'
+00:24:56 - update_session_with_cookie self._cookie={'gravity': 'HQBWN4NI53EKVX4DNOGFQLTAXBQZJDNKOYYHWVCLEWJQSX67ZEAGQOU2H222AM6L7JKQ6EPMALCGACJKQ4QB5TTCWGIVIZX5GSWPOYY', 'expires': 1765347896.0, 'X-Grvt-Account-Id': '36Nsff3KiPHfnM87mt4vMvpuosU'} self._session.cookie_jar=<aiohttp.cookiejar.CookieJar object at 0x0000012978973950> self._session.headers=<CIMultiDict('Content-Type': 'application/json', 'X-Grvt-Account-Id': '36Nsff3KiPHfnM87mt4vMvpuosU')>
+00:24:56 - GrvtCcxtWS initialized self.api_url={<GrvtWSEndpointType.MARKET_DATA: 'mdg'>: 'wss://market-data.grvt.io/ws', <GrvtWSEndpointType.TRADE_DATA: 'tdg'>: 'wss://trades.grvt.io/ws', <GrvtWSEndpointType.MARKET_DATA_RPC_FULL: 'mdg_rpc_full'>: 'wss://market-data.grvt.io/ws/full', <GrvtWSEndpointType.TRADE_DATA_RPC_FULL: 'tdg_rpc_full'>: 'wss://trades.grvt.io/ws/full'}
+00:24:56 - GrvtCcxtWS initialized self.ws={<GrvtWSEndpointType.MARKET_DATA: 'mdg'>: None, <GrvtWSEndpointType.TRADE_DATA: 'tdg'>: None, <GrvtWSEndpointType.MARKET_DATA_RPC_FULL: 'mdg_rpc_full'>: None, <GrvtWSEndpointType.TRADE_DATA_RPC_FULL: 'tdg_rpc_full'>: None}
+00:24:56 - load_markets START
+00:24:56 - GrvtCcxtWS _auth_and_post path='https://market-data.grvt.io/full/v1/instruments' payload={'kind': [<GrvtInstrumentKind.PERPETUAL: 'PERPETUAL'>], 'limit': 1000, 'is_active': True}
+payload_json='{"kind": ["PERPETUAL"], "limit": 1000, "is_active": true}'
+00:24:56 - GrvtCcxtWS _read_messages mdg connection not open
+00:24:56 - GrvtCcxtWS _read_messages tdg connection not open
+00:24:56 - GrvtCcxtWS _read_messages mdg_rpc_full connection not open
+00:24:56 - GrvtCcxtWS _read_messages tdg_rpc_full connection not open
+   - PAC: Equity $18.24 | Available $18.24
+00:24:56 - GrvtCcxtWS _read_messages mdg connection not open
+00:24:56 - GrvtCcxtWS _read_messages tdg connection not open
+00:24:56 - GrvtCcxtWS _read_messages mdg_rpc_full connection not open
+00:24:56 - GrvtCcxtWS _read_messages tdg_rpc_full connection not open
+   - LTR: Equity $22.01 | Available $22.01
+00:24:56 - GrvtCcxtWS _auth_and_post path='https://market-data.grvt.io/full/v1/instruments' OK return_value=<ClientResponse(https://market-data.grvt.io/full/v1/instruments) [200 OK]>
+<CIMultiDictProxy('Date': 'Tue, 09 Dec 2025 15:24:56 GMT', 'Content-Type': 'application/json', 'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive', 'Vary': 'Accept-Encoding', 'Vary': 'Origin', 'Vary': 'Origin', 'x-ratelimit-limit': '1500', 'x-ratelimit-remaining': '1499', 'strict-transport-security': 'max-age=31536000; includeSubDomains', 'Content-Encoding': 'br', 'cf-cache-status': 'DYNAMIC', 'Nel': '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}', 'Report-To': '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=54ArbIKLXWiRivnYR7gmW3W6CvLfAVbeSMMmtgEDh30L0mp3Ngiiq18zR3RM391cfJylp44DDv8pIGCL50lr79RFQVXqagpKkFvFBZ87pcramw%3D%3D"}]}', 'Server': 'cloudflare', 'CF-RAY': '9ab583258b33e09c-NRT')>
+ response=**TOO LONG**
+00:24:56 - load_markets: loaded 75 markets.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'AAVE_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='AAVE_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAFD80>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'ADA_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='ADA_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAF560>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'AI16Z_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='AI16Z_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEADF80>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'KAITO_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='KAITO_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAEE80>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'ARB_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='ARB_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAF7E0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'ASTER_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='ASTER_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAEC00>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'ATOM_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='ATOM_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAC2C0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'AVAX_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='AVAX_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAE200>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'AVNT_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='AVNT_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAF1A0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'BCH_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='BCH_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAF060>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'BERA_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='BERA_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAEF20>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'BNB_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='BNB_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAEDE0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'KBONK_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='KBONK_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAECA0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'BTC_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='BTC_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAEB60>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'CFX_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='CFX_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAEA20>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'CRV_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='CRV_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAE8E0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'DOGE_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='DOGE_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAE7A0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'DOT_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='DOT_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAE660>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'EIGEN_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='EIGEN_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAE520>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'ENA_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='ENA_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAE3E0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'ETH_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='ETH_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAE2A0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'FARTCOIN_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='FARTCOIN_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAE160>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'FIL_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='FIL_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAE020>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'HBAR_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='HBAR_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEADEE0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'HYPE_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='HYPE_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEADDA0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'ICP_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='ICP_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEADC60>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'IP_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='IP_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEADB20>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'JUP_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='JUP_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAD9E0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'LDO_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='LDO_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAD8A0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'LINEA_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='LINEA_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAD760>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'LINK_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='LINK_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAD620>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'LTC_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='LTC_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAD4E0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'MNT_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='MNT_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAD3A0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'MON_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='MON_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAD260>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'MOODENG_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='MOODENG_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAD120>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'NEAR_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='NEAR_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEACFE0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'ONDO_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='ONDO_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEACEA0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'OP_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='OP_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEACD60>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'PAXG_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='PAXG_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEACC20>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'PENDLE_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='PENDLE_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEACAE0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'PENGU_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='PENGU_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAC9A0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'KPEPE_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='KPEPE_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAC860>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'POL_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='POL_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAC720>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'POPCAT_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='POPCAT_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAC5E0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'PROVE_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='PROVE_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x000001297EEAC180>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'PUMP_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='PUMP_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x0000012978931A80>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'RESOLV_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='RESOLV_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x0000012978931B20>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'SEI_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='SEI_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x0000012978932160>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'KSHIB_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='KSHIB_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x0000012978932480>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'SOL_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='SOL_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x00000129789325C0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'STRK_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='STRK_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x0000012978932FC0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'SUI_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='SUI_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x0000012978933E20>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'TAO_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='TAO_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x0000012978932840>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'TON_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='TON_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x0000012978932D40>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'TRUMP_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='TRUMP_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x0000012978931120>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'UNI_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='UNI_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x0000012978932AC0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'VINE_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='VINE_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x0000012978933B00>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'VIRTUAL_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='VIRTUAL_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x00000129789334C0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'W_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='W_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x0000012978933740>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'WIF_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='WIF_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x00000129789322A0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'WLD_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='WLD_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x0000012978931E40>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'WLFI_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='WLFI_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x0000012978931D00>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'XLM_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='XLM_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x0000012978931C60>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'XPL_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='XPL_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x00000129789314E0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'XRP_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='XRP_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x0000012978930720>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'ZEC_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='ZEC_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x0000012978930EA0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'ZEN_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='ZEN_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x0000012978930CC0>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' params={'instrument': 'ZK_USDT_Perp', 'depth': 10} ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'>/versioned_stream='v1.book.s'/selector='ZK_USDT_Perp@500-10' callback:<function GrvtExchange.start_ws.<locals>.make_cb.<locals>.wrapped at 0x0000012978930E00>
+00:24:56 - GrvtCcxtWS subscribe stream='book.s' Connection not open. Will subscribe on connect.
+00:24:56 - GrvtCcxtWS _reconnect grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> STARTS
+00:24:56 - GrvtCcxtWS No connection to close
+   - EXT: Equity $23.48 | Available $23.48
+
+⚔️ [주문 실행]
+
+👉 [HL] 0G BUY 진입 시도
+   - 목표: $45.0 (Price: $0.99573) -> Qty: 45.1930
+00:24:57 -    ✅ 레버리지 x3 설정
+00:24:58 - ✅ [HL] 주문 성공: 0G BUY (Reduce: False)
+00:24:58 -    ✅ 주문 성공: {'status': 'ok', 'response': {'type': 'order', 'data': {'statuses': [{'filled': {'totalSz': '45.0', 'avgPx': '0.9959', 'oid': 263667938555, 'cloid': '0xba5ed11067f2cc08ba5ed10000ba5ed1'}}]}}}
+00:24:58 - GrvtCcxtWS _read_messages mdg connection not open
+00:24:58 - GrvtCcxtWS _read_messages tdg connection not open
+00:24:58 - GrvtCcxtWS _read_messages mdg_rpc_full connection not open
+00:24:58 - GrvtCcxtWS _read_messages tdg_rpc_full connection not open
+00:24:58 - GrvtCcxtWS _read_messages mdg connection not open
+00:24:58 - GrvtCcxtWS _read_messages tdg connection not open
+00:24:58 - GrvtCcxtWS _read_messages mdg_rpc_full connection not open
+00:24:58 - GrvtCcxtWS _read_messages tdg_rpc_full connection not open
+00:24:58 - GrvtCcxtWS connect_channel GrvtWSEndpointType.MARKET_DATA Connected to wss://market-data.grvt.io/ws extra_headers={'Cookie': 'gravity=HQBWN4NI53EKVX4DNOGFQLTAXBQZJDNKOYYHWVCLEWJQSX67ZEAGQOU2H222AM6L7JKQ6EPMALCGACJKQ4QB5TTCWGIVIZX5GSWPOYY', 'X-Grvt-Account-Id': '36Nsff3KiPHfnM87mt4vMvpuosU'}
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='AAVE_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='AAVE_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 1, "stream": "v1.book.s", "feed": ["AAVE_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 1, "stream": "v1.book.s", "feed": ["AAVE_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='ADA_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='ADA_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 2, "stream": "v1.book.s", "feed": ["ADA_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 2, "stream": "v1.book.s", "feed": ["ADA_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='AI16Z_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='AI16Z_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 3, "stream": "v1.book.s", "feed": ["AI16Z_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 3, "stream": "v1.book.s", "feed": ["AI16Z_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='KAITO_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='KAITO_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 4, "stream": "v1.book.s", "feed": ["KAITO_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 4, "stream": "v1.book.s", "feed": ["KAITO_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='ARB_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='ARB_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 5, "stream": "v1.book.s", "feed": ["ARB_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 5, "stream": "v1.book.s", "feed": ["ARB_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='ASTER_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='ASTER_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 6, "stream": "v1.book.s", "feed": ["ASTER_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 6, "stream": "v1.book.s", "feed": ["ASTER_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='ATOM_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='ATOM_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 7, "stream": "v1.book.s", "feed": ["ATOM_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 7, "stream": "v1.book.s", "feed": ["ATOM_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='AVAX_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='AVAX_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 8, "stream": "v1.book.s", "feed": ["AVAX_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 8, "stream": "v1.book.s", "feed": ["AVAX_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='AVNT_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='AVNT_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 9, "stream": "v1.book.s", "feed": ["AVNT_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 9, "stream": "v1.book.s", "feed": ["AVNT_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='BCH_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='BCH_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 10, "stream": "v1.book.s", "feed": ["BCH_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 10, "stream": "v1.book.s", "feed": ["BCH_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='BERA_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='BERA_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 11, "stream": "v1.book.s", "feed": ["BERA_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 11, "stream": "v1.book.s", "feed": ["BERA_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='BNB_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='BNB_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 12, "stream": "v1.book.s", "feed": ["BNB_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 12, "stream": "v1.book.s", "feed": ["BNB_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='KBONK_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='KBONK_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 13, "stream": "v1.book.s", "feed": ["KBONK_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 13, "stream": "v1.book.s", "feed": ["KBONK_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='BTC_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='BTC_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 14, "stream": "v1.book.s", "feed": ["BTC_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 14, "stream": "v1.book.s", "feed": ["BTC_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='CFX_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='CFX_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 15, "stream": "v1.book.s", "feed": ["CFX_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 15, "stream": "v1.book.s", "feed": ["CFX_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='CRV_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='CRV_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 16, "stream": "v1.book.s", "feed": ["CRV_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 16, "stream": "v1.book.s", "feed": ["CRV_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='DOGE_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='DOGE_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 17, "stream": "v1.book.s", "feed": ["DOGE_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 17, "stream": "v1.book.s", "feed": ["DOGE_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='DOT_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='DOT_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 18, "stream": "v1.book.s", "feed": ["DOT_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 18, "stream": "v1.book.s", "feed": ["DOT_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='EIGEN_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='EIGEN_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 19, "stream": "v1.book.s", "feed": ["EIGEN_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 19, "stream": "v1.book.s", "feed": ["EIGEN_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='ENA_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='ENA_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 20, "stream": "v1.book.s", "feed": ["ENA_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 20, "stream": "v1.book.s", "feed": ["ENA_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='ETH_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='ETH_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 21, "stream": "v1.book.s", "feed": ["ETH_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 21, "stream": "v1.book.s", "feed": ["ETH_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='FARTCOIN_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='FARTCOIN_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 22, "stream": "v1.book.s", "feed": ["FARTCOIN_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 22, "stream": "v1.book.s", "feed": ["FARTCOIN_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='FIL_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='FIL_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 23, "stream": "v1.book.s", "feed": ["FIL_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 23, "stream": "v1.book.s", "feed": ["FIL_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='HBAR_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='HBAR_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 24, "stream": "v1.book.s", "feed": ["HBAR_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 24, "stream": "v1.book.s", "feed": ["HBAR_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='HYPE_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='HYPE_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 25, "stream": "v1.book.s", "feed": ["HYPE_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 25, "stream": "v1.book.s", "feed": ["HYPE_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='ICP_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='ICP_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 26, "stream": "v1.book.s", "feed": ["ICP_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 26, "stream": "v1.book.s", "feed": ["ICP_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='IP_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='IP_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 27, "stream": "v1.book.s", "feed": ["IP_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 27, "stream": "v1.book.s", "feed": ["IP_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='JUP_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='JUP_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 28, "stream": "v1.book.s", "feed": ["JUP_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 28, "stream": "v1.book.s", "feed": ["JUP_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='LDO_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='LDO_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 29, "stream": "v1.book.s", "feed": ["LDO_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 29, "stream": "v1.book.s", "feed": ["LDO_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='LINEA_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='LINEA_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 30, "stream": "v1.book.s", "feed": ["LINEA_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 30, "stream": "v1.book.s", "feed": ["LINEA_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='LINK_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='LINK_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 31, "stream": "v1.book.s", "feed": ["LINK_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 31, "stream": "v1.book.s", "feed": ["LINK_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='LTC_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='LTC_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 32, "stream": "v1.book.s", "feed": ["LTC_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 32, "stream": "v1.book.s", "feed": ["LTC_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='MNT_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='MNT_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 33, "stream": "v1.book.s", "feed": ["MNT_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 33, "stream": "v1.book.s", "feed": ["MNT_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='MON_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='MON_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 34, "stream": "v1.book.s", "feed": ["MON_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 34, "stream": "v1.book.s", "feed": ["MON_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='MOODENG_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='MOODENG_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 35, "stream": "v1.book.s", "feed": ["MOODENG_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 35, "stream": "v1.book.s", "feed": ["MOODENG_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='NEAR_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='NEAR_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 36, "stream": "v1.book.s", "feed": ["NEAR_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 36, "stream": "v1.book.s", "feed": ["NEAR_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='ONDO_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='ONDO_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 37, "stream": "v1.book.s", "feed": ["ONDO_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 37, "stream": "v1.book.s", "feed": ["ONDO_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='OP_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='OP_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 38, "stream": "v1.book.s", "feed": ["OP_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 38, "stream": "v1.book.s", "feed": ["OP_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='PAXG_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='PAXG_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 39, "stream": "v1.book.s", "feed": ["PAXG_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 39, "stream": "v1.book.s", "feed": ["PAXG_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='PENDLE_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='PENDLE_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 40, "stream": "v1.book.s", "feed": ["PENDLE_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 40, "stream": "v1.book.s", "feed": ["PENDLE_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='PENGU_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='PENGU_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 41, "stream": "v1.book.s", "feed": ["PENGU_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 41, "stream": "v1.book.s", "feed": ["PENGU_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='KPEPE_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='KPEPE_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 42, "stream": "v1.book.s", "feed": ["KPEPE_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 42, "stream": "v1.book.s", "feed": ["KPEPE_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='POL_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='POL_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 43, "stream": "v1.book.s", "feed": ["POL_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 43, "stream": "v1.book.s", "feed": ["POL_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='POPCAT_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='POPCAT_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 44, "stream": "v1.book.s", "feed": ["POPCAT_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 44, "stream": "v1.book.s", "feed": ["POPCAT_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='PROVE_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='PROVE_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 45, "stream": "v1.book.s", "feed": ["PROVE_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 45, "stream": "v1.book.s", "feed": ["PROVE_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='PUMP_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='PUMP_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 46, "stream": "v1.book.s", "feed": ["PUMP_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 46, "stream": "v1.book.s", "feed": ["PUMP_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='RESOLV_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='RESOLV_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 47, "stream": "v1.book.s", "feed": ["RESOLV_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 47, "stream": "v1.book.s", "feed": ["RESOLV_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='SEI_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='SEI_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 48, "stream": "v1.book.s", "feed": ["SEI_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 48, "stream": "v1.book.s", "feed": ["SEI_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='KSHIB_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='KSHIB_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 49, "stream": "v1.book.s", "feed": ["KSHIB_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 49, "stream": "v1.book.s", "feed": ["KSHIB_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='SOL_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='SOL_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 50, "stream": "v1.book.s", "feed": ["SOL_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 50, "stream": "v1.book.s", "feed": ["SOL_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='STRK_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='STRK_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 51, "stream": "v1.book.s", "feed": ["STRK_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 51, "stream": "v1.book.s", "feed": ["STRK_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='SUI_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='SUI_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 52, "stream": "v1.book.s", "feed": ["SUI_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 52, "stream": "v1.book.s", "feed": ["SUI_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='TAO_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='TAO_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 53, "stream": "v1.book.s", "feed": ["TAO_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 53, "stream": "v1.book.s", "feed": ["TAO_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='TON_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='TON_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 54, "stream": "v1.book.s", "feed": ["TON_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 54, "stream": "v1.book.s", "feed": ["TON_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='TRUMP_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='TRUMP_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 55, "stream": "v1.book.s", "feed": ["TRUMP_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 55, "stream": "v1.book.s", "feed": ["TRUMP_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='UNI_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='UNI_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 56, "stream": "v1.book.s", "feed": ["UNI_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 56, "stream": "v1.book.s", "feed": ["UNI_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='VINE_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='VINE_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 57, "stream": "v1.book.s", "feed": ["VINE_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 57, "stream": "v1.book.s", "feed": ["VINE_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='VIRTUAL_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='VIRTUAL_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 58, "stream": "v1.book.s", "feed": ["VIRTUAL_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 58, "stream": "v1.book.s", "feed": ["VIRTUAL_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='W_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='W_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 59, "stream": "v1.book.s", "feed": ["W_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 59, "stream": "v1.book.s", "feed": ["W_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='WIF_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='WIF_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 60, "stream": "v1.book.s", "feed": ["WIF_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 60, "stream": "v1.book.s", "feed": ["WIF_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='WLD_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='WLD_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 61, "stream": "v1.book.s", "feed": ["WLD_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 61, "stream": "v1.book.s", "feed": ["WLD_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='WLFI_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='WLFI_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 62, "stream": "v1.book.s", "feed": ["WLFI_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 62, "stream": "v1.book.s", "feed": ["WLFI_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='XLM_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='XLM_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 63, "stream": "v1.book.s", "feed": ["XLM_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 63, "stream": "v1.book.s", "feed": ["XLM_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='XPL_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='XPL_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 64, "stream": "v1.book.s", "feed": ["XPL_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 64, "stream": "v1.book.s", "feed": ["XPL_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='XRP_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='XRP_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 65, "stream": "v1.book.s", "feed": ["XRP_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 65, "stream": "v1.book.s", "feed": ["XRP_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='ZEC_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='ZEC_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 66, "stream": "v1.book.s", "feed": ["ZEC_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 66, "stream": "v1.book.s", "feed": ["ZEC_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='ZEN_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='ZEN_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 67, "stream": "v1.book.s", "feed": ["ZEN_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 67, "stream": "v1.book.s", "feed": ["ZEN_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _resubscribe grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s'/selector='ZK_USDT_Perp@500-10'
+00:24:58 - GrvtCcxtWS _subscribe_to_stream ws_end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> versioned_stream='v1.book.s' selector='ZK_USDT_Perp@500-10' versioned_stream='v1.book.s' subscribe_json='{"request_id": 68, "stream": "v1.book.s", "feed": ["ZK_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _send() end_point_type=<GrvtWSEndpointType.MARKET_DATA: 'mdg'> url:wss://market-data.grvt.io/ws message='{"request_id": 68, "stream": "v1.book.s", "feed": ["ZK_USDT_Perp@500-10"], "method": "subscribe", "is_full": true}'
+00:24:58 - GrvtCcxtWS _reconnect grvt_endpoint_type=<GrvtWSEndpointType.TRADE_DATA: 'tdg'> STARTS
+00:24:58 - GrvtCcxtWS No connection to close
+00:24:59 - GrvtCcxtWS connect_channel GrvtWSEndpointType.TRADE_DATA Connected to wss://trades.grvt.io/ws extra_headers={'Cookie': 'gravity=HQBWN4NI53EKVX4DNOGFQLTAXBQZJDNKOYYHWVCLEWJQSX67ZEAGQOU2H222AM6L7JKQ6EPMALCGACJKQ4QB5TTCWGIVIZX5GSWPOYY', 'X-Grvt-Account-Id': '36Nsff3KiPHfnM87mt4vMvpuosU'}
+00:24:59 - GrvtCcxtWS _reconnect grvt_endpoint_type=<GrvtWSEndpointType.MARKET_DATA_RPC_FULL: 'mdg_rpc_full'> STARTS
+00:24:59 - GrvtCcxtWS No connection to close
+00:24:59 - ℹ️ [LTR] 0G 가격 조회 실패 -> HL 가격($0.99575) 참조
+
+👉 [LTR] 0G SELL 진입 시도
+   - 목표: $45.0 (Price: $0.99575) -> Qty: 45.1921
+00:24:59 - ⚙️ [Lighter] 0G 레버리지 x3 시도...
+00:24:59 - GrvtCcxtWS connect_channel GrvtWSEndpointType.MARKET_DATA_RPC_FULL Connected to wss://market-data.grvt.io/ws/full extra_headers={'Cookie': 'gravity=HQBWN4NI53EKVX4DNOGFQLTAXBQZJDNKOYYHWVCLEWJQSX67ZEAGQOU2H222AM6L7JKQ6EPMALCGACJKQ4QB5TTCWGIVIZX5GSWPOYY', 'X-Grvt-Account-Id': '36Nsff3KiPHfnM87mt4vMvpuosU'}
+00:24:59 - GrvtCcxtWS _reconnect grvt_endpoint_type=<GrvtWSEndpointType.TRADE_DATA_RPC_FULL: 'tdg_rpc_full'> STARTS
+00:24:59 - GrvtCcxtWS No connection to close
+00:24:59 - ✅ [Lighter] 0G 레버리지 x3 설정 성공
+00:24:59 -    ✅ 레버리지 x3 설정
+00:24:59 - ✅ [LTR] 주문 성공: 0G(ID:84) SELL
+00:24:59 -    ✅ 주문 성공: {'id': RespSendTx(code=200, message='{"ratelimit": "3942 volume quota remained"}', tx_hash='59c298b25816e9654e159fe38c1f59e6651bb465ec26e91839882284adf546ec45abec54aa0c4707', predicted_execution_time_ms=1765293899800, volume_quota_remaining=3942, additional_properties={}), 'status': 'open'}
+00:24:59 - GrvtCcxtWS connect_channel GrvtWSEndpointType.TRADE_DATA_RPC_FULL Connected to wss://trades.grvt.io/ws/full extra_headers={'Cookie': 'gravity=HQBWN4NI53EKVX4DNOGFQLTAXBQZJDNKOYYHWVCLEWJQSX67ZEAGQOU2H222AM6L7JKQ6EPMALCGACJKQ4QB5TTCWGIVIZX5GSWPOYY', 'X-Grvt-Account-Id': '36Nsff3KiPHfnM87mt4vMvpuosU'}
+00:24:59 - connect_all_channels Connection status: all_are_connected=True self.force_reconnect_flag=False
+00:25:00 - ℹ️ [PAC] 2Z 가격 조회 실패 -> HL 가격($0.130315) 참조
+
+👉 [PAC] 2Z BUY 진입 시도
+   - 목표: $45.0 (Price: $0.130315) -> Qty: 345.3171
+00:25:00 - 💓 [EXT] TIA Mid: $0.6070
+00:25:00 - GrvtCcxtWS subscribed to stream:v1.book.s
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 1, 'stream': 'v1.book.s', 'subs': ['AAVE_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['266762'], 'latest_sequence_number': ['266761']}
+00:25:00 - 💓 [GRVT] AAVE Mid: $188.8500
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 2, 'stream': 'v1.book.s', 'subs': ['ADA_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['258675'], 'latest_sequence_number': ['258674']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 3, 'stream': 'v1.book.s', 'subs': ['AI16Z_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['1'], 'latest_sequence_number': ['0']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 4, 'stream': 'v1.book.s', 'subs': ['KAITO_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['261686'], 'latest_sequence_number': ['261685']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 5, 'stream': 'v1.book.s', 'subs': ['ARB_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['163584'], 'latest_sequence_number': ['163583']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 6, 'stream': 'v1.book.s', 'subs': ['ASTER_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['206370'], 'latest_sequence_number': ['206369']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 7, 'stream': 'v1.book.s', 'subs': ['ATOM_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['135258'], 'latest_sequence_number': ['135257']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 8, 'stream': 'v1.book.s', 'subs': ['AVAX_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['309119'], 'latest_sequence_number': ['309118']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 9, 'stream': 'v1.book.s', 'subs': ['AVNT_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['82058'], 'latest_sequence_number': ['82057']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 10, 'stream': 'v1.book.s', 'subs': ['BCH_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['323179'], 'latest_sequence_number': ['323178']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 11, 'stream': 'v1.book.s', 'subs': ['BERA_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['79552'], 'latest_sequence_number': ['79551']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 12, 'stream': 'v1.book.s', 'subs': ['BNB_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['338925'], 'latest_sequence_number': ['338924']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 13, 'stream': 'v1.book.s', 'subs': ['KBONK_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['321294'], 'latest_sequence_number': ['321293']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 14, 'stream': 'v1.book.s', 'subs': ['BTC_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['350234'], 'latest_sequence_number': ['350233']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 15, 'stream': 'v1.book.s', 'subs': ['CFX_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['276553'], 'latest_sequence_number': ['276552']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 16, 'stream': 'v1.book.s', 'subs': ['CRV_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['33550'], 'latest_sequence_number': ['33549']}
+00:25:00 - GrvtCcxtWS _read_messages mdg connection not open
+00:25:00 - GrvtCcxtWS _read_messages tdg connection not open
+00:25:00 - GrvtCcxtWS _read_messages mdg_rpc_full connection not open
+00:25:00 - GrvtCcxtWS _read_messages tdg_rpc_full connection not open
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 17, 'stream': 'v1.book.s', 'subs': ['DOGE_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['324216'], 'latest_sequence_number': ['324215']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 18, 'stream': 'v1.book.s', 'subs': ['DOT_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['223080'], 'latest_sequence_number': ['223079']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 19, 'stream': 'v1.book.s', 'subs': ['EIGEN_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['278693'], 'latest_sequence_number': ['278692']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 20, 'stream': 'v1.book.s', 'subs': ['ENA_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['231520'], 'latest_sequence_number': ['231519']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 21, 'stream': 'v1.book.s', 'subs': ['ETH_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['349066'], 'latest_sequence_number': ['349065']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 22, 'stream': 'v1.book.s', 'subs': ['FARTCOIN_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['322218'], 'latest_sequence_number': ['322217']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 23, 'stream': 'v1.book.s', 'subs': ['FIL_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['146428'], 'latest_sequence_number': ['146427']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 24, 'stream': 'v1.book.s', 'subs': ['HBAR_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['305931'], 'latest_sequence_number': ['305930']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 25, 'stream': 'v1.book.s', 'subs': ['HYPE_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['323824'], 'latest_sequence_number': ['323823']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 26, 'stream': 'v1.book.s', 'subs': ['ICP_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['234386'], 'latest_sequence_number': ['234385']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 27, 'stream': 'v1.book.s', 'subs': ['IP_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['193537'], 'latest_sequence_number': ['193536']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 28, 'stream': 'v1.book.s', 'subs': ['JUP_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['191978'], 'latest_sequence_number': ['191977']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 29, 'stream': 'v1.book.s', 'subs': ['LDO_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['298207'], 'latest_sequence_number': ['298206']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 30, 'stream': 'v1.book.s', 'subs': ['LINEA_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['34454'], 'latest_sequence_number': ['34453']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 31, 'stream': 'v1.book.s', 'subs': ['LINK_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['322123'], 'latest_sequence_number': ['322122']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 32, 'stream': 'v1.book.s', 'subs': ['LTC_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['227561'], 'latest_sequence_number': ['227560']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 33, 'stream': 'v1.book.s', 'subs': ['MNT_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['1'], 'latest_sequence_number': ['0']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 34, 'stream': 'v1.book.s', 'subs': ['MON_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['126972'], 'latest_sequence_number': ['126971']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 35, 'stream': 'v1.book.s', 'subs': ['MOODENG_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['288249'], 'latest_sequence_number': ['288248']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 36, 'stream': 'v1.book.s', 'subs': ['NEAR_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['164328'], 'latest_sequence_number': ['164327']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 37, 'stream': 'v1.book.s', 'subs': ['ONDO_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['260034'], 'latest_sequence_number': ['260033']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 38, 'stream': 'v1.book.s', 'subs': ['OP_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['234085'], 'latest_sequence_number': ['234084']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 39, 'stream': 'v1.book.s', 'subs': ['PAXG_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['284224'], 'latest_sequence_number': ['284223']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 40, 'stream': 'v1.book.s', 'subs': ['PENDLE_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['310252'], 'latest_sequence_number': ['310251']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 41, 'stream': 'v1.book.s', 'subs': ['PENGU_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['338536'], 'latest_sequence_number': ['338535']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 42, 'stream': 'v1.book.s', 'subs': ['KPEPE_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['243883'], 'latest_sequence_number': ['243882']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 43, 'stream': 'v1.book.s', 'subs': ['POL_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['253529'], 'latest_sequence_number': ['253528']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 44, 'stream': 'v1.book.s', 'subs': ['POPCAT_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['203011'], 'latest_sequence_number': ['203010']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 45, 'stream': 'v1.book.s', 'subs': ['PROVE_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['42413'], 'latest_sequence_number': ['42412']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 46, 'stream': 'v1.book.s', 'subs': ['PUMP_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['158858'], 'latest_sequence_number': ['158857']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 47, 'stream': 'v1.book.s', 'subs': ['RESOLV_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['54573'], 'latest_sequence_number': ['54572']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 48, 'stream': 'v1.book.s', 'subs': ['SEI_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['114679'], 'latest_sequence_number': ['114678']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 49, 'stream': 'v1.book.s', 'subs': ['KSHIB_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['283093'], 'latest_sequence_number': ['283092']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 50, 'stream': 'v1.book.s', 'subs': ['SOL_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['329934'], 'latest_sequence_number': ['329933']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 51, 'stream': 'v1.book.s', 'subs': ['STRK_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['52795'], 'latest_sequence_number': ['52794']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 52, 'stream': 'v1.book.s', 'subs': ['SUI_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['339137'], 'latest_sequence_number': ['339136']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 53, 'stream': 'v1.book.s', 'subs': ['TAO_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['252758'], 'latest_sequence_number': ['252757']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 54, 'stream': 'v1.book.s', 'subs': ['TON_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['322483'], 'latest_sequence_number': ['322482']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 55, 'stream': 'v1.book.s', 'subs': ['TRUMP_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['232897'], 'latest_sequence_number': ['232896']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 56, 'stream': 'v1.book.s', 'subs': ['UNI_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['282902'], 'latest_sequence_number': ['282901']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 57, 'stream': 'v1.book.s', 'subs': ['VINE_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['127766'], 'latest_sequence_number': ['127765']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 58, 'stream': 'v1.book.s', 'subs': ['VIRTUAL_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['327398'], 'latest_sequence_number': ['327397']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 59, 'stream': 'v1.book.s', 'subs': ['W_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['256939'], 'latest_sequence_number': ['256938']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 60, 'stream': 'v1.book.s', 'subs': ['WIF_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['286358'], 'latest_sequence_number': ['286357']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 61, 'stream': 'v1.book.s', 'subs': ['WLD_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['311013'], 'latest_sequence_number': ['311012']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 62, 'stream': 'v1.book.s', 'subs': ['WLFI_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['171675'], 'latest_sequence_number': ['171674']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 63, 'stream': 'v1.book.s', 'subs': ['XLM_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['331051'], 'latest_sequence_number': ['331050']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 64, 'stream': 'v1.book.s', 'subs': ['XPL_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['195413'], 'latest_sequence_number': ['195412']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 65, 'stream': 'v1.book.s', 'subs': ['XRP_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['317534'], 'latest_sequence_number': ['317533']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 66, 'stream': 'v1.book.s', 'subs': ['ZEC_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['344780'], 'latest_sequence_number': ['344779']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 67, 'stream': 'v1.book.s', 'subs': ['ZEN_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['320759'], 'latest_sequence_number': ['320758']}
+00:25:00 - GrvtCcxtWS _read_messages mdg Non-actionable message:{'request_id': 68, 'stream': 'v1.book.s', 'subs': ['ZK_USDT_Perp@500-10'], 'unsubs': [], 'num_snapshots': [1], 'first_sequence_number': ['145554'], 'latest_sequence_number': ['145553']}
+00:25:00 -    ✅ 레버리지 x3 설정
+00:25:01 - 💓 [HL] BTC Mid: $90726.5000
+00:25:01 - 💓 [Pacifica] BTC Mid: $90706.0000
+00:25:01 - ✅ [PAC] 주문 성공: 2Z BUY 345 (Reduce: False)
+00:25:01 -    ✅ 주문 성공: {'success': True, 'data': {'order_id': 1642844268}, 'error': None, 'code': None}
+
+👉 [GRVT] AAVE BUY 진입 시도
+   - 목표: $45.0 (Price: $188.79500000000002) -> Qty: 0.2384
+00:25:01 - ✅ [GRVT] AAVE 레버리지 x3 설정 성공
+00:25:01 -    ✅ 레버리지 x3 설정
+00:25:02 - get_signable_message order=GrvtOrder(sub_account_id='7754890162939536', time_in_force=<TimeInForce.IMMEDIATE_OR_CANCEL: 'IMMEDIATE_OR_CANCEL'>, legs=[GrvtOrderLeg(instrument='AAVE_USDT_Perp', size=Decimal('0.200000000'), is_buying_asset=True, limit_price=Decimal('190.682950000'))], signature=GrvtSignature(signer='', r='', s='', v=0, expiration='1765380302039135000', nonce=1334205390), metadata=OrderMetadata(client_order_id='3601227307', create_time=None), is_market=False, post_only=False, reduce_only=False) domain_data={'name': 'GRVT Exchange', 'version': '0', 'chainId': 325}
+EIP712_ORDER_MESSAGE_TYPE={'Order': [{'name': 'subAccountID', 'type': 'uint64'}, {'name': 'isMarket', 'type': 'bool'}, {'name': 'timeInForce', 'type': 'uint8'}, {'name': 'postOnly', 'type': 'bool'}, {'name': 'reduceOnly', 'type': 'bool'}, {'name': 'legs', 'type': 'OrderLeg[]'}, {'name': 'nonce', 'type': 'uint32'}, {'name': 'expiration', 'type': 'int64'}], 'OrderLeg': [{'name': 'assetID', 'type': 'uint256'}, {'name': 'contractSize', 'type': 'uint64'}, {'name': 'limitPrice', 'type': 'uint64'}, {'name': 'isBuyingContract', 'type': 'bool'}]}
+message_data={'subAccountID': '7754890162939536', 'isMarket': False, 'timeInForce': 3, 'postOnly': False, 'reduceOnly': False, 'legs': [{'assetID': '0x032201', 'contractSize': 200000000, 'limitPrice': 190682950000, 'isBuyingContract': True}], 'nonce': 1334205390, 'expiration': '1765380302039135000'}
+00:25:02 - Error creating order, {'code': 2064, 'message': 'Invalid limit price tick', 'status': 400}
+00:25:02 - 🚀 [GRVT] 주문 전송: AAVE BUY 0.2 (Limit IOC (Ext Ref) @ 190.68)
+00:25:02 -    ❌ 주문 실패
+
+👉 [EXT] AAVE SELL 진입 시도
+   - 목표: $45.0 (Price: $188.97500000000002) -> Qty: 0.2381
+00:25:02 -    ✅ 레버리지 x3 설정
+00:25:02 - Error response from https://api.starknet.extended.exchange/api/v1/user/order: {"status":"ERROR","error":{"code":1123,"message":"Invalid quantity precision"}}
+00:25:02 - ❌ [EXT] 주문 실패: Error response from https://api.starknet.extended.exchange/api/v1/user/order: code 400 - {"status":"ERROR","error":{"code":1123,"message":"Invalid quantity precision"}}
+00:25:02 -    ❌ 주문 실패
+
+💰 [주문 후 잔고]
+00:25:02 - GrvtCcxtWS _read_messages mdg connection not open
+00:25:02 - GrvtCcxtWS _read_messages tdg connection not open
+00:25:02 - GrvtCcxtWS _read_messages mdg_rpc_full connection not open
+00:25:02 - GrvtCcxtWS _read_messages tdg_rpc_full connection not open
+00:25:04 - GrvtCcxtWS _read_messages mdg connection not open
+00:25:04 - GrvtCcxtWS _read_messages tdg connection not open
+00:25:04 - GrvtCcxtWS _read_messages mdg_rpc_full connection not open
+00:25:04 - GrvtCcxtWS _read_messages tdg_rpc_full connection not open
+00:25:04 - connect_all_channels Connection status: all_are_connected=True self.force_reconnect_flag=False
+   - HL: Equity $33.89 | Pos: 0G:45.0
+   - GRVT: Equity $19.53 | Pos:
+   - PAC: Equity $18.22 | Pos: 2Z:345.0
+   - LTR: Equity $22.00 | Pos: 0G:45.19
+00:25:06 - GrvtCcxtWS _read_messages mdg connection not open
+00:25:06 - GrvtCcxtWS _read_messages tdg connection not open
+00:25:06 - GrvtCcxtWS _read_messages mdg_rpc_full connection not open
+00:25:06 - GrvtCcxtWS _read_messages tdg_rpc_full connection not open
+   - EXT: Equity $23.48 | Pos:
+
+🧹 [포지션 정리 (청산)]
+>> 포지션을 정리(청산)하시겠습니까? (y/n): y
+👉 [HL] 0G SELL (청산)
+00:25:18 - ✅ [HL] 주문 성공: 0G SELL (Reduce: True)
+00:25:18 -    ✅ 청산 성공
+👉 [LTR] 0G BUY (청산)
+00:25:18 - GrvtCcxtWS _read_messages mdg connection not open
+00:25:18 - GrvtCcxtWS _read_messages tdg connection not open
+00:25:18 - GrvtCcxtWS _read_messages mdg_rpc_full connection not open
+00:25:18 - GrvtCcxtWS _read_messages tdg_rpc_full connection not open
+00:25:18 - connect_all_channels Connection status: all_are_connected=True self.force_reconnect_flag=False
+00:25:18 - 💓 [GRVT] AAVE Mid: $188.8000
+00:25:18 - 💓 [EXT] LINEA Mid: $0.0080
+00:25:18 - 💓 [HL] BTC Mid: $90699.5000
+00:25:18 - 💓 [Pacifica] BTC Mid: $90705.9362
+00:25:18 - ✅ [LTR] 주문 성공: 0G(ID:84) BUY
+00:25:18 -    ✅ 청산 성공
+👉 [PAC] 2Z SELL (청산)
+00:25:19 - ✅ [PAC] 주문 성공: 2Z SELL 345 (Reduce: True)
+00:25:19 -    ✅ 청산 성공
+00:25:19 - 🛑 프로그램 종료 중...
+Exception ignored in: <function Grv

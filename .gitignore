@@ -1,0 +1,9 @@
+# 환경변수 및 키 파일 (절대 업로드 금지)
+.env
+settings_private.py
+api_keys.py
+**/__pycache__
+*.log
+*.xlsx
+*.csv
+.vscode/
