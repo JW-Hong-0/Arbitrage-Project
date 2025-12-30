@@ -5,8 +5,17 @@ import logging
 import time
 import random
 from dotenv import load_dotenv
+from decimal import Decimal, ROUND_DOWN
 
-# 로깅 설정
+# 1. 필터 클래스 정의
+class GRVTFilter(logging.Filter):
+    def filter(self, record):
+        # 차단하고 싶은 키워드 리스트
+        blacklist = ['get_signable_message', 'EIP712_ORDER_MESSAGE_TYPE', 'message_data', 'get_cookie_with_expiration']
+        # 메시지에 블랙리스트 단어가 포함되어 있으면 False 반환 (출력 안 함)
+        return not any(word in record.getMessage() for word in blacklist)
+
+# 2. 로깅 기본 설정
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - [FARMER] - %(message)s',
@@ -16,12 +25,19 @@ logging.basicConfig(
         logging.FileHandler("volume_farmer.log", encoding='utf-8')
     ]
 )
+
+# 3. 루트 로거에 필터 적용 (모든 로그에 대해 검사)
+for handler in logging.root.handlers:
+    handler.addFilter(GRVTFilter())
+
 log = logging.getLogger("VolumeFarmer")
 
+# 기존 파일 임포트
 try:
     from exchange_apis import HyperliquidExchange, GrvtExchange
+    from utils.trade_sizer import TradeSizer  #
 except ImportError:
-    log.error("❌ exchange_apis.py를 찾을 수 없습니다.")
+    logging.error("❌ 필수 모듈(exchange_apis.py, trade_sizer.py)을 찾을 수 없습니다.")
     sys.exit(1)
 
 # ==========================================
@@ -29,13 +45,13 @@ except ImportError:
 # ==========================================
 SYMBOLS = ["BTC", "ETH"]      # 파밍 대상 코인
 LEVERAGE = 10                 # 레버리지
-MARGIN_PER_ASSET = 20.0       # 코인당 투입 증거금 ($20 x 10배 = $200 규모)
+MARGIN_PER_ASSET = 10.0       # 코인당 투입 증거금 ($20 x 10배 = $200 규모)
 
 # 시간 설정 (단위: 초)
 MIN_HOLD_SEC = 60             # 포지션 유지 (파밍) 최소 시간
-MAX_HOLD_SEC = 300            # 포지션 유지 (파밍) 최대 시간
-MIN_REST_SEC = 60             # 휴식 시간 최소
-MAX_REST_SEC = 180            # 휴식 시간 최대
+MAX_HOLD_SEC = 900            # 포지션 유지 (파밍) 최대 시간
+MIN_REST_SEC = 180             # 휴식 시간 최소
+MAX_REST_SEC = 300            # 휴식 시간 최대
 
 class VolumeFarmer:
     def __init__(self):
@@ -46,6 +62,7 @@ class VolumeFarmer:
             sys.exit(1)
         self.hl = None
         self.grvt = None
+        self.sizer = None # 수량 최적화 도구
 
     async def initialize(self):
         log.info("🔌 거래소 연결 중...")
@@ -53,11 +70,10 @@ class VolumeFarmer:
         self.grvt = GrvtExchange()
         
         log.info("📥 시장 데이터 로드 중...")
-        await asyncio.gather(
-            self.hl.load_markets(),
-            self.grvt.load_markets()
-        )
-        log.info("✅ 설정 완료")
+        await asyncio.gather(self.hl.load_markets(), self.grvt.load_markets())
+        
+        self.sizer = TradeSizer(self.hl, self.grvt)
+        await self.sizer.initialize()
 
     async def get_current_price(self, symbol):
         try:
@@ -129,6 +145,24 @@ class VolumeFarmer:
             log.info(f"💰 [잔고] HL ${hl_eq:.1f} ({hl_pos}) | GRVT ${grvt_eq:.1f} ({grvt_pos})")
         except: pass
 
+    def get_synchronized_qty(self, symbol, price, target_notional):
+        # 1. 목표 수량 계산 (예: $100 / $3000 = 0.03333)
+        raw_qty = target_notional / price
+        
+        # 2. 거래소별 제약 사항 가져오기
+        hl_stats = self.market_map.get(symbol, {}).get('hl', {'min_size': 0.001})
+        grvt_stats = self.market_map.get(symbol, {}).get('grvt', {'min_size': 0.01}) # ETH는 0.01
+
+        # 3. [핵심] 두 거래소 중 '더 큰 최소 수량'을 기준으로 잡음
+        # ETH의 경우 0.01(GRVT)이 0.001(HL)보다 크므로 0.01이 기준이 됨
+        min_executable_size = max(hl_stats['min_size'], grvt_stats['min_size'])
+        
+        # 4. 기준 수량의 배수로 내림 처리 (0.0333 -> 0.03)
+        # 이렇게 해야 양쪽 거래소 모두에서 '잔액 부족'이나 '수량 미달' 에러가 안 납니다.
+        synchronized_qty = (raw_qty // min_executable_size) * min_executable_size
+        
+        return float(Decimal(str(synchronized_qty)).quantize(Decimal(str(min_executable_size)), rounding=ROUND_DOWN))
+
     # ---------------------------------------------------------
     # ⚔️ 매매 사이클
     # ---------------------------------------------------------
@@ -158,7 +192,16 @@ class VolumeFarmer:
             price = await self.get_current_price(symbol)
             if price <= 0: continue
             
-            amount = (MARGIN_PER_ASSET * LEVERAGE) / price
+            # [수정] sizer를 통해 정밀도가 보정된 수량을 가져옵니다.
+            target_size_usd = MARGIN_PER_ASSET * LEVERAGE
+            entry_info = self.sizer.calculate_entry_params(symbol, price, target_size_usd)
+            
+            if not entry_info or entry_info['qty'] <= 0:
+                log.warning(f"⚠️ {symbol} 주문 가능 수량 부족 (최소주문량 미달)")
+                continue
+
+            amount = entry_info['qty']
+            log.info(f"💎 {symbol} 동기화 수량 적용: {amount} (약 ${entry_info['notional']:.1f})")
             
             if symbol == "BTC":
                 h_side, g_side = btc_hl_side, btc_grvt_side
@@ -220,10 +263,11 @@ class VolumeFarmer:
             try:
                 log.info(f"\n🔄 === Round {round_count} 시작 ===")
                 
-                # 1. 안전 장치: 시작 전 무조건 잔고 털기 (Stacking 방지)
+                # [수정] self.hl.close_all_positions() 대신 아래 함수를 사용해야 합니다.
+                # 이 함수는 VolumeFarmer 클래스 내부에 정의된 '전체 청산' 로직입니다.
                 await self.close_all_existing_positions()
                 
-                # 2. 매매 사이클
+                # 2. 매매 사이클 실행
                 await self.run_cycle(round_count)
                 
                 # 3. 휴식
@@ -234,6 +278,7 @@ class VolumeFarmer:
                 round_count += 1
 
             except KeyboardInterrupt:
+                log.info("정지 요청 감지. 프로그램을 종료합니다.")
                 break
             except Exception as e:
                 log.error(f"Bot Error: {e}")

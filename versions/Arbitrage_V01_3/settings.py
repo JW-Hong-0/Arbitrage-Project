@@ -1,6 +1,6 @@
 # settings.py
 # (⭐️ 최종 버전: 다중 거래소 매핑, 전략 그룹화, %/고정 금액 동시 지원)
-#cd /d D:\Program_Files\Crypto\HyperLiquid\Arbitrage_V01_3
+#cd /d D:\Program_Files\Crypto\VIBE_CODING\Arbitrage_Project\versions\Arbitrage_V01_3
 #python arbitrage_bot.py
 #python run_ui.py
 #python gui_dashboard_V5.py

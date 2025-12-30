@@ -50,13 +50,13 @@ except ImportError:
 
 # --- Logging ---
 logging.getLogger("pysdk").setLevel(logging.ERROR) 
-logging.getLogger("GrvtCcxtWS").setLevel(logging.ERROR)
+logging.getLogger("GrvtCcxtWS").setLevel(logging.CRITICAL)
 logging.getLogger("websockets").setLevel(logging.WARNING)
 logging.getLogger("asyncio").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 log = logging.getLogger("ExchangeAPIs")
-log.setLevel(logging.INFO)
+log.setLevel(logging.CRITICAL)
 
 # --- Based App Constants ---
 BASED_BUILDER_ADDRESS = "0x1924b8561eeF20e70Ede628A296175D358BE80e5"
@@ -148,6 +148,7 @@ class HyperliquidExchange(Exchange):
         self.info = Info(hl_constants.MAINNET_API_URL, skip_ws=True)
         self.hl_exchange = None
         self.account_address = None
+        self.meta = None  # <-- [추가] meta 속성 초기화
         
         if private_key:
             account = Account.from_key(private_key)
@@ -169,8 +170,9 @@ class HyperliquidExchange(Exchange):
     async def load_markets(self):
         log.info("⏳ [HL] 시장 정보 로딩...")
         try:
-            meta = self.info.meta()
-            for asset in meta['universe']:
+            # [수정] 로컬 변수 meta 대신 self.meta에 저장하여 외부(TradeSizer)에서 접근 가능하게 함
+            self.meta = self.info.meta() #
+            for asset in self.meta['universe']:
                 name = asset['name']
                 sz_decimals = asset['szDecimals']
                 self.market_info[name] = {
@@ -406,6 +408,7 @@ class GrvtExchange(Exchange):
                     loop=loop, 
                     parameters=params
                 )
+                self.ws = self.grvt  # <-- [추가] TradeSizer와의 호환성을 위해 ws 변수도 할당
                 log.info(f"✅ [GRVT] 초기화 (SubAccount: {sub_account_id})")
                 
             except Exception as e:
@@ -509,13 +512,12 @@ class GrvtExchange(Exchange):
             return False
 
     def get_instrument_stats(self, ticker: str):
+        """[수정] 이미 로드된 market_info에서 정확한 값을 가져옴"""
         try:
-            symbol = self._get_correct_symbol(ticker)
-            if self.ws and self.ws.markets and symbol in self.ws.markets:
-                m = self.ws.markets[symbol]
-                min_size = float(m.get('min_size') or m.get('limits', {}).get('amount', {}).get('min', 0.001))
-                max_lev = float(m.get('limits', {}).get('leverage', {}).get('max', 20.0))
-                return {'min_size': min_size, 'max_lev': max_lev}
+            if ticker in self.market_info:
+                info = self.market_info[ticker]
+                # GRVT는 보통 최대 레버리지가 20배이므로 기본값 설정
+                return {'min_size': info['min_size'], 'max_lev': 20.0}
         except Exception: pass
         return {'min_size': 0.001, 'max_lev': 10.0}
 
