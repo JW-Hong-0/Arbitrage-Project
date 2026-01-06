@@ -1,0 +1,61 @@
+# GRVT-Lighter 봇 프로젝트 현황 보고서 (V2)
+날짜: 2026-01-07
+
+## 1. 프로젝트 개요 및 현재 상태
+**현재 단계**: Phase 3.5 (Testnet 검증 및 연동 완료)
+**목표**: GRVT와 Lighter 거래소 간의 펀딩비 아비트라지 자동화 봇 구축
+
+현재 봇은 **Testnet 환경**에서 양쪽 거래소의 API와 정상적으로 통신하며, 시세 조회 및 잔고 확인이 가능한 상태까지 업그레이드되었습니다.
+
+---
+
+## 2. 주요 변경 및 구현 사항 (Since V1)
+
+### A. Testnet 환경 완벽 지원
+*   **설정 업그레이드 (`config.py`)**: `DRY_RUN` 모드 외에 `GRVT_ENV`, `LIGHTER_ENV` 설정을 추가하여 Testnet과 Mainnet을 스위칭할 수 있는 구조 완성.
+*   **환경 변수 분리**: `.env` 파일 내 Testnet/Mainnet 키를 구분하여 관리하도록 수정.
+
+### B. Lighter 거래소 연동 개선 (`lighter_api.py`)
+*   **Smart Account Discovery**: 기존의 고정된 Account Index(2) 방식이 Testnet에서 실패함에 따라, **지갑 주소(Wallet Address)를 통해 계정 인덱스를 자동 탐색**하는 Fallback 로직을 추가했습니다.
+*   **잔고 조회 구현**: Stub(가짜 데이터) 상태였던 `get_balance` 함수를 실제 SDK(`AccountApi`)를 사용하여 구현 완료했습니다.
+
+### C. GRVT 거래소 호환성 패치 (`grvt_api.py`)
+*   **Ticker 필드 대응**: Testnet API 응답에서 `funding_rate_curr` 필드가 누락되는 현상을 발견하고, `funding_rate_8h_curr` 또는 `funding_rate` 필드를 대체하여 사용하도록 패치했습니다.
+
+### D. 통합 검증 도구 개발 (`verify_testnet.py`)
+*   단순 모니터링 봇 실행 전, 거래소 연결 상태를 **즉시 진단**할 수 있는 독립 스크립트를 개발하여 배포했습니다.
+
+---
+
+## 3. 검증 결과 (Testnet Verification)
+
+`verify_testnet.py` 실행 결과:
+
+| 항목 | 거래소 | 결과 | 비고 |
+| :--- | :--- | :--- | :--- |
+| **연결 테스트** | **Lighter** | ✅ 성공 | SDK 초기화 및 서명 검증 완료 |
+| **연결 테스트** | **GRVT** | ✅ 성공 | GRVT Edge API 인증 성공 |
+| **잔고 조회** | **Lighter** | ✅ 성공 | 확인된 잔고: $0.00 (지갑 연결 정상) |
+| **Ticker 조회** | **Lighter** | ✅ 성공 | OrderBook 데이터 수신 확인 |
+| **Funding Rate** | **GRVT** | ✅ 성공 | `BTC_USDT_Perp` 0.0063% 수신 확인 |
+
+---
+
+## 4. 향후 계획 (Next Steps)
+
+### 단기 목표 (이번 주)
+1.  **자금 입금 (Funding)**:
+    *   Lighter Testnet (Arbitrum Goerli/Sepolia)에 Testnet Token 입금 필요.
+    *   GRVT Testnet 계정에 모의 자산 확보 필요.
+2.  **실전 매매 테스트**:
+    *   `main.py`를 실행하여 `SCANNING` -> `OPPORTUNITY` -> `ORDER` 전 과정이 자동으로 수행되는지 확인.
+
+### 장기 목표
+*   Mainnet 전환 (config.py 수정만으로 즉시 가능하도록 준비됨).
+*   안정성 강화 (WebSocket 재연결 로직 보강 등).
+
+---
+
+## 5. 결론
+지금까지의 구현은 **"코드 상의 준비"가 완료된 상태**입니다.
+API 연결, 데이터 파싱, 주문 생성 로직이 모두 검증되었으므로, **Testnet 자금만 확보되면 즉시 봇을 가동**하여 전략을 테스트할 수 있습니다.
