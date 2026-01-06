@@ -1,0 +1,79 @@
+# GRVT-Lighter Cross Hedging Bot - Project Handoff Document
+Date: 2026-01-06
+Status: Phase 1 (Core Logic) Implemented
+
+## 1. Project Overview
+This project is a Delta-Neutral Cross-Hedging Bot between **GRVT** (Maker) and **Lighter** (Taker).
+The goal is to capture funding rate differences while maintaining a neutral position.
+
+**Path**: `src/GRVT_Lighter_Bot/`
+
+## 2. Current Implementation Status
+
+### A. Configuration (`config.py`)
+- **Status**: ✅ Completed
+- **Details**: Updated to use real environment variables provided by the user (`LIGHTER_WALLET_ADDRESS`, `GRVT_SECRET_KEY`, `GRVT_TRADING_ACCOUNT_ID`, etc.).
+
+### B. GRVT Integration (`exchanges/grvt_api.py`)
+- **Status**: ✅ Functional (WebSocket Added)
+- **Features**:
+    - `get_funding_rate`: Uses `fetch_ticker` to retrieve the current funding rate.
+    - `get_all_tickers`: Wraps `fetch_tickers` for scanning.
+    - `place_limit_order`: Wrapper around `create_order` (Limit).
+    - `listen_fills`: **CRITICAL**. Implemented using `pysdk.grvt_ccxt_ws.GrvtCcxtWS`. securely connects to GRVT WebSocket to listen for user trades/fills.
+
+### C. Lighter Integration (`exchanges/lighter_api.py`)
+- **Status**: ✅ Functional (Signing Added)
+- **Features**:
+    - `get_funding_rate`: Uses `FundingApi` from Lighter SDK.
+    - `get_all_tickers`: Proxy using `funding_rates("ALL")`.
+    - `place_market_order`: **CRITICAL**. Integrated `signer_client.SignerClient` to sign transactions with the private key.
+    - `ensure_market_map`: Placeholder logic to map symbols (e.g., "BTC-USDT") to Lighter Market IDs (needs refinement).
+
+### D. Strategy Core (`strategy.py`)
+- **Status**: ⚠️ Skeleton Implemented (Needs Logic Refinement)
+- **Features**:
+    - `scan_market`: Scaffolding to fetch all rates and find the best spread.
+    - `print_dashboard`: Live CLI output showing status and opportunities.
+    - `run`: Main loop that launches the WS listener and runs the scanner.
+    - **Missing**: The actual logic to trigger `place_limit_order` on GRVT and the callback link to `place_market_order` on Lighter is currently `pass`ed out for safety.
+
+### E. Entry Point (`main.py`)
+- **Status**: ✅ Completed
+- **Details**: Validated `sys.path` hacks to ensure SDKs (`sdks/grvt-pysdk`, `sdks/lighter-python`) are imported correctly without installation.
+
+---
+
+## 3. Next Steps (To-Do List)
+
+The next AI agent should prioritize the following tasks in order:
+
+### Phase 1.5: Logic Refinement
+1.  **Lighter Market Mapping**:
+    - Update `lighter_api.py` -> `ensure_market_map`. The current hardcoded map `{"BTC-USDT": 0}` is unsafe. Implement a dynamic fetch (e.g., via `OrderBookApi` or `InfoApi`) to get real Market IDs.
+2.  **Unit Scaling**:
+    - Verify GRVT funding rate units (raw integer vs float).
+    - Verify Lighter Amount scaling (SDK example used `base_amount=1000` for 0.1 ETH). Need to clarify the decimal implementation for accurate hedging.
+
+### Phase 2: Execution & Risk (The "Real" Bot)
+3.  **Connect the Loop**:
+    - In `strategy.py`, update `scan_market` to actually return a valid target.
+    - In `run` loop, if opportunity > threshold, call `grvt.place_limit_order`.
+    - In `on_fill` callback, UNCOMMENT the call to `lighter.place_market_order`.
+4.  **Risk Management**:
+    - Implement `max_position` check.
+    - Implement `slide` (slippage) protection logic.
+
+### Phase 3: Robustness
+5.  **Reconnection**: Verify `GrvtCcxtWS` automatically handles disconnects. If not, add a wrapper loop.
+6.  **Persistence**: Save open positions to a file/Redis so the bot remembers state after restart.
+
+## 4. How to Run
+```bash
+# From Arbitrage-Project root
+python -m src.GRVT_Lighter_Bot.main
+```
+
+## 5. Critical Notes
+- **Private Keys**: The `config.py` uses `os.getenv`. Ensure `.env` is populated.
+- **Lighter Host**: We assumed the SDK default host is correct. If connection fails, check `lighter/configuration.py` for the Mainnet REST URL.
