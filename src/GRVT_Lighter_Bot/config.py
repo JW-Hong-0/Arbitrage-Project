@@ -18,6 +18,8 @@ class Config:
     LIGHTER_WEB3_RPC_URL = os.getenv("LIGHTER_WEB3_RPC_URL", "https://arb1.arbitrum.io/rpc")
 
     # Strategy Settings
+    DRY_RUN = True # Safety first
+    LIGHTER_AMOUNT_SCALAR = 10000 # 0.0001 ETH/BTC unit? specific to Lighter
     SYMBOL = "BTC-USDT" # Valid symbol for both (mapped internally)
     ORDER_AMOUNT = 0.001
     MAX_POSITION = 0.1

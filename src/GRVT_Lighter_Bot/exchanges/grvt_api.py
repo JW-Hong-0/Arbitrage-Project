@@ -3,39 +3,45 @@ import asyncio
 from pysdk.grvt_ccxt import GrvtCcxt
 from pysdk.grvt_ccxt_env import GrvtEnv
 from ..config import Config
+from ..utils import Utils
 
 logger = logging.getLogger(__name__)
 
 class GrvtExchange:
     def __init__(self):
         env = GrvtEnv.TESTNET if Config.GRVT_ENV == "TESTNET" else GrvtEnv.PROD
+        
+        # Reference Logic: Get loop and use it for GrvtCcxtWS
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            
+        # Reference Logic: Suppress Pysdk Logger
+        quiet = logging.getLogger("quiet_grvt")
+        quiet.setLevel(logging.CRITICAL)
+        
         self.client = GrvtCcxt(
             env=env,
-            logger=logger,
+            logger=quiet, # Use quiet logger
             parameters={
                 "api_key": Config.GRVT_API_KEY,
                 "private_key": Config.GRVT_PRIVATE_KEY,
                 "sub_account_id": Config.GRVT_TRADING_ACCOUNT_ID,
             }
         )
+        self._ws_running = False
         
     async def get_funding_rate(self, symbol: str):
         """
         Fetch funding rate for the symbol.
         Returns the current funding rate.
-        Note: The unit needs verification (likely raw 1e9 or similar).
         """
         try:
-            # fetch_ticker is synchronous in the SDK based on the class definition I saw?
-            # The class GrvtCcxt inherited from GrvtCcxtBase and uses requests.
-            # So this is blocking. I should run in executor if I need async.
-            # Or use GrvtRawAsync if available.
-            # For now, wrap in to_thread.
             ticker = await asyncio.to_thread(self.client.fetch_ticker, symbol)
             
             if ticker and 'funding_rate_curr' in ticker:
-                # Assuming raw value, returning as float
-                # Based on legacy code/docs, might need scaling, but raw is safest for diff check
                 return float(ticker['funding_rate_curr'])
             return None
         except Exception as e:
@@ -47,12 +53,6 @@ class GrvtExchange:
         Fetch all tickers to find best funding.
         """
         try:
-            # GrvtCcxt has fetch_tickers (plural) usually or we scan known symbols
-            # If not available, we might need to fetch instruments first
-            # Checking legacy or standard ccxt, usually fetch_tickers
-            # For now, let's try fetch_tickers if available, else iterate
-            
-            # Note: client is synchronous
             tickers = await asyncio.to_thread(self.client.fetch_tickers)
             return tickers
         except Exception as e:
@@ -61,16 +61,25 @@ class GrvtExchange:
 
     async def place_limit_order(self, symbol: str, side: str, price: float, amount: float):
         try:
-            # side: 'buy' or 'sell'
-            # price: float
-            # amount: float
+            # Quantize amount
+            tick_size = 0.0001
+            quantized_amount = Utils.quantize_amount(amount, tick_size)
+            
+            if quantized_amount <= 0:
+                logger.error(f"Order amount too small after quantization: {amount} -> {quantized_amount}")
+                return None
+
+            # Added post_only to params
+            params = {'post_only': True}
+            
             order = await asyncio.to_thread(
                 self.client.create_order,
                 symbol,
                 'limit',
                 side,
-                amount,
-                price
+                quantized_amount,
+                price,
+                params
             )
             logger.info(f"GRVT Order Placed: {order}")
             return order
@@ -78,51 +87,83 @@ class GrvtExchange:
             logger.error(f"GRVT Order Failed: {e}")
             return None
         
-    async def listen_fills(self, callback):
+    async def get_balance(self):
         """
-        Listen to user trades/fills using GrvtCcxtWS and call callback(fill_data).
+        Fetch USDT balance and positions.
+        Returns dict with 'equity', 'available', 'positions'.
         """
         try:
-            from pysdk.grvt_ccxt_ws import GrvtCcxtWS
+            # Run blocking calls in thread
+            bal = await asyncio.to_thread(self.client.fetch_balance)
+            positions = await asyncio.to_thread(self.client.fetch_positions)
             
-            # Using the same config as REST client
-            # GrvtCcxtWS might need specific initialization
-            # Assuming it takes similar params
-            # We need to run this in a way that keeps the connection open
+            # Parse Balance
+            equity = float(bal.get('USDT', {}).get('total', 0))
+            available = float(bal.get('USDT', {}).get('free', 0))
             
-            self.ws_client = GrvtCcxtWS(
-                env=GrvtEnv.TESTNET if Config.GRVT_ENV == "TESTNET" else GrvtEnv.PROD,
-                logger=logger,
-                parameters={
+            # Parse Positions
+            active_positions = []
+            for p in positions:
+                size = float(p.get('size') or p.get('contracts') or 0)
+                if size != 0:
+                    active_positions.append({
+                        'symbol': p.get('symbol'),
+                        'size': size,
+                        'side': 'long' if size > 0 else 'short',
+                        'entry_price': float(p.get('entry_price', 0))
+                    })
+            
+            return {
+                'equity': equity,
+                'available': available,
+                'positions': active_positions
+            }
+        except Exception as e:
+            logger.error(f"Error fetching GRVT balance: {e}")
+            # Return safe default
+            return {'equity': 0, 'available': 0, 'positions': []}
+
+    async def listen_fills(self, callback):
+        """
+        Listen for user fills via WebSocket.
+        """
+        if self._ws_running: return
+        self._ws_running = True
+        
+        while self._ws_running:
+            try:
+                from pysdk.grvt_ccxt_ws import GrvtCcxtWS
+                # Reference Logic: Loop Injection for WS
+                loop = asyncio.get_running_loop()
+                env = GrvtEnv.TESTNET if Config.GRVT_ENV == "TESTNET" else GrvtEnv.PROD
+                
+                quiet = logging.getLogger("quiet_grvt_ws")
+                quiet.setLevel(logging.CRITICAL)
+                
+                params = {
                     "api_key": Config.GRVT_API_KEY,
                     "private_key": Config.GRVT_PRIVATE_KEY,
                     "sub_account_id": Config.GRVT_TRADING_ACCOUNT_ID,
                 }
-            )
-            
-            logger.info("Starting GRVT WebSocket...")
-            
-            # The WS client in legacy code had a 'watch_my_trades' or similar pattern
-            # Using standard CCXT pattern if possible: watch_my_trades(symbol)
-            # We need a loop
-            
-            await self.ws_client.load_markets()
-            symbol = Config.SYMBOL
-            
-            while True:
-                try:
-                    # watch_my_trades returns a list of trades
-                    trades = await self.ws_client.watch_my_trades(symbol)
-                    for trade in trades:
-                        # Process trade
-                        logger.info(f"GRVT Trade/Fill: {trade}")
-                        if callback:
-                            await callback(trade)
-                except Exception as e:
-                    logger.error(f"GRVT WS Error: {e}")
-                    await asyncio.sleep(5) # Reconnect delay
-                    
-        except ImportError:
-            logger.error("Could not import GrvtCcxtWS. Check SDK installation.")
-        except Exception as e:
-             logger.error(f"Critical GRVT WS Failure: {e}")
+                
+                self.ws = GrvtCcxtWS(
+                    env=env, 
+                    loop=loop, 
+                    logger=quiet, 
+                    parameters=params
+                )
+                
+                await self.ws.initialize()
+                logger.info("GRVT WebSocket Initialized.")
+                
+                # Subscribe to user trades/fills
+                await self.ws.subscribe(stream='user.trades', callback=callback)
+                logger.info("Subscribed to user.trades")
+                
+                # Mock keepalive to prevent loop exit in this version
+                while self._ws_running:
+                     await asyncio.sleep(1)
+                     
+            except Exception as e:
+                logger.error(f"GRVT WS Error: {e}")
+                await asyncio.sleep(5)

@@ -1,0 +1,63 @@
+# GRVT-Lighter 봇 프로젝트 현황 및 에러 로그 분석 보고서
+날짜: 2026-01-06
+
+## 1. 현재 구현 상태 (Implementation Status)
+
+현재까지 **Phase 3 (기능 보완)** 단계까지 구현이 완료되었으며, 주요 기능은 다음과 같습니다.
+
+### A. 봇 핵심 로직 (`src/GRVT_Lighter_Bot/`)
+1.  **전략 실행 (`strategy.py`)**:
+    *   **시장 스캔 (`scan_market`)**: GRVT와 Lighter의 펀딩비 차이를 실시간으로 계산하여 진입 기회를 포착합니다.
+    *   **집행 루프**: 기회 포착 시 GRVT에 **Post-Only 지정가 주문(Maker)**을 제출하고, 체결 시 Lighter에 **시장가 주문(Taker)**으로 헷징합니다.
+2.  **자산 관리 및 대시보드**:
+    *   터미널 화면에 **실시간 자산(Equity/Free)**과 **보유 포지션(Active Positions)**을 테이블 형태로 보여줍니다.
+    *   `Asset Check` 로직이 API를 통해 잔고를 조화합니다 (현재 Dry-Run에서는 Lighter 잔고가 Mock 데이터로 표시됨).
+3.  **거래소 API 연동**:
+    *   **GRVT (`grvt_api.py`)**: 웹소켓(`user.trades`)을 통한 체결 감지, 지정가 주문, 잔고 조회 구현 완료.
+    *   **Lighter (`lighter_api.py`)**: Lighter SDK 연동, 마켓 ID 매핑, 시장가 주문, 잔고 조회(Stub) 구현 완료.
+4.  **안전 장치 (Robustness)**:
+    *   **틱 보정(Quantization)**: `utils.py`를 통해 주문 수량을 거래소 호가 단위(Tick Size)에 맞춰 자동 절사(내림)하여 주문 거부 오류를 방지했습니다.
+    *   **티커 매핑 (`constants.py`)**: `BTC`와 같은 베이스 심볼을 `BTC_USDT_Perp`(GRVT), `BTC-USDT`(Lighter)로 자동 변환하여 처리합니다.
+
+---
+
+## 2. 테스트 중 발생한 에러 로그 분석 (Error Log Analysis)
+
+Dry-Run 테스트 과정에서 발생한 주요 에러 로그와 그 원인/해결책입니다.
+
+| 로그 메시지 (Error Log) | 원인 (Cause) | 조치 상태 / 해결책 (Status/Fix) |
+| :--- | :--- | :--- |
+| **`SignerClient init failed: invalid account index`** | **Lighter 계정 미초기화**. Lighter는 입금 이력이 없으면 Account Index가 생성되지 않아 SDK 초기화가 실패합니다. | **사용자 조치 필요**. 실제 지갑에서 Lighter에 소액 입금 후 재시도 필요. (Dry-Run에서는 무시됨) |
+| **`get_cookie_with_expiration ... Error getting cookie: 'gravity'`** | **GRVT 테스트넷 인증 이슈**. 스크립트 실행 환경이나 네트워크 상태에 따라 간헐적으로 발생하는 인증 경고입니다. | **모니터링**. 봇 동작(주문/웹소켓)에 치명적이지 않으면 무시 가능하나, 빈번하면 네트워크/API 키 재확인 필요. |
+| **`Error fetching GRVT balance: this action requires a trading_account_id`** | **GRVT 계정 정보 누락**. `.env` 파일에 `GRVT_TRADING_ACCOUNT_ID`가 올바르게 설정되지 않았거나 값이 `0`일 때 발생합니다. | **사용자 조치 필요**. `.env`에 올바른 `Trading Account ID` 입력 필요. |
+| **`AttributeError: 'GrvtExchange' object has no attribute 'client'`** | **코드 복구 중 누락**. 개발 과정에서 파일 수정 도구 오류로 인해 클래스 초기화 코드가 잠시 삭제되었던 문제입니다. | **해결됨 (Fixed)**. 파일을 정상 코드로 복구하여 현재는 발생하지 않습니다. |
+| **`Lighter order amount too small`** | **수량 계산 오류**. 초기 구현 시 아주 작은 수량(0.0001 BTC 미만 등)이 퀀타이징 되면서 0이 되는 경우가 있었습니다. | **해결됨 (Fixed)**. `utils.py`의 로직 및 `LIGHTER_AMOUNT_SCALAR` 조정으로 해결됨. |
+
+---
+
+## 3. 데이터 검증 (Verification Tool)
+
+펀딩비 데이터 수신 여부를 확실히 검증하기 위해 **`check_funding.py`** 툴을 별도로 제작했습니다.
+
+*   **위치**: 프로젝트 루트 폴더 (`check_funding.py`)
+*   **용도**: Dry-Run 모드를 끄고 실제 API를 호출하여 Funding Rate 데이터를 화면에 출력합니다.
+*   **사용법**:
+    1.  `.env`에 API 키 입력.
+    2.  터미널에서 `python check_funding.py` 실행.
+    3.  `✅ SUCCESS` 메시지가 뜨면 데이터 수신 기능 검증 완료.
+
+---
+
+## 4. 향후 권장 사항 (Next Steps)
+
+1.  **필수 설정 확인**:
+    *   `.env` 파일에 **실제 API Key, Private Key, Trading Account ID**를 정확히 입력해주세요.
+    *   Lighter 거래소 웹사이트에 접속하여 지갑 연결 및 1회 이상 입금(Deposit)을 수행해주세요.
+2.  **Step-by-Step 실행**:
+    *   **1단계**: `check_funding.py`로 데이터 수신 확인.
+    *   **2단계**: `config.py`의 `DRY_RUN = False` 변경.
+    *   **3단계**: `ORDER_AMOUNT`를 최소(예: 0.0001)로 설정 후 `main.py` 실행하여 소액 테스트.
+3.  **모니터링**:
+    *   대시보드의 'ASSETS' 란에 실제 잔고가 올바르게 표시되는지 확인하세요.
+
+이 보고서를 참고하여 설정을 마무리하시면 봇을 안전하게 운용하실 수 있습니다.
