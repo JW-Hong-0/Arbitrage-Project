@@ -41,8 +41,14 @@ class GrvtExchange:
         try:
             ticker = await asyncio.to_thread(self.client.fetch_ticker, symbol)
             
-            if ticker and 'funding_rate_curr' in ticker:
-                return float(ticker['funding_rate_curr'])
+            if ticker:
+                # Check for funding_rate_curr (default) or fallbacks
+                if 'funding_rate_curr' in ticker:
+                    return float(ticker['funding_rate_curr'])
+                elif 'funding_rate_8h_curr' in ticker:
+                     return float(ticker['funding_rate_8h_curr'])
+                elif 'funding_rate' in ticker:
+                     return float(ticker['funding_rate'])
             return None
         except Exception as e:
             logger.error(f"Error fetching GRVT funding rate: {e}")

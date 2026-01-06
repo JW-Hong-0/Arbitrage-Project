@@ -14,6 +14,12 @@ logger = logging.getLogger(__name__)
 class LighterExchange:
     def __init__(self):
         self.config = Configuration() 
+        try:
+             import lighter
+             self.lighter_module = lighter # Store module for AccountApi usage
+        except:
+             self.lighter_module = None
+        
         # Note: If Config.LIGHTER_API_URL exists, use it.
         
         self.api_client = ApiClient(self.config)
@@ -25,10 +31,11 @@ class LighterExchange:
             pk = pk[2:]
             
         try:
+            idx = Config.LIGHTER_API_KEY_INDEX
             self.client = SignerClient(
                 url=self.config.host, 
-                account_index=0, 
-                api_private_keys={0: pk}
+                account_index=idx, 
+                api_private_keys={idx: pk}
             )
         except Exception as e:
             if Config.DRY_RUN:
@@ -118,18 +125,53 @@ class LighterExchange:
 
     async def get_balance(self):
         """
-        Fetch USDC/Collateral balance and positions.
+        Fetch USDC/Collateral balance and positions using AccountApi.
         """
         try:
-            # Phase 1: Stub / Dry Run Data
             if Config.DRY_RUN:
                 return {
-                    'equity': 5000.0, # Mock $5k
+                    'equity': 5000.0,
                     'available': 4000.0,
                     'positions': []
                 }
             
-            return {'equity': 0, 'available': 0, 'positions': []}
+            if not self.client or not self.lighter_module:
+                 return {'equity': 0, 'available': 0, 'positions': []}
+
+            # Use AccountApi
+            acc_api = self.lighter_module.AccountApi(self.client.api_client)
+            idx = getattr(self.client, 'account_index', Config.LIGHTER_API_KEY_INDEX)
+            
+            # Fetch account by index first
+            try:
+                resp = await acc_api.account(by="index", value=str(idx))
+            except Exception:
+                # Fallback: Fetch by Owner Address
+                resp = await acc_api.account(by="owner", value=Config.LIGHTER_WALLET_ADDRESS)
+            
+            # Extract data from response
+            if isinstance(resp, list) and resp: data = resp[0]
+            elif hasattr(resp, 'accounts') and resp.accounts: data = resp.accounts[0]
+            else: data = resp
+
+            equity = float(getattr(data, 'collateral', 0))
+            available = float(getattr(data, 'available_balance', equity))
+            
+            pos_list = []
+            if hasattr(data, 'positions'):
+                for p in data.positions:
+                    sz = float(getattr(p, 'position', 0))
+                    if sz != 0:
+                        side = "LONG" if getattr(p, 'sign', 0) == 1 else "SHORT"
+                        pos_list.append({
+                            'symbol': getattr(p, 'symbol', ''),
+                            'size': abs(sz),
+                            'amount': abs(sz),
+                            'side': side,
+                            'entry_price': float(getattr(p, 'avg_entry_price', 0))
+                        })
+                        
+            return {'equity': equity, 'available': available, 'positions': pos_list}
         except Exception as e:
             logger.error(f"Error fetching Lighter balance: {e}")
             return {'equity': 0, 'available': 0, 'positions': []}

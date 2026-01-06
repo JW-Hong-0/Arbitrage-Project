@@ -49,9 +49,9 @@ MARGIN_PER_ASSET = 10.0       # 코인당 투입 증거금 ($20 x 10배 = $200 �
 
 # 시간 설정 (단위: 초)
 MIN_HOLD_SEC = 60             # 포지션 유지 (파밍) 최소 시간
-MAX_HOLD_SEC = 900            # 포지션 유지 (파밍) 최대 시간
-MIN_REST_SEC = 180             # 휴식 시간 최소
-MAX_REST_SEC = 300            # 휴식 시간 최대
+MAX_HOLD_SEC = 600            # 포지션 유지 (파밍) 최대 시간
+MIN_REST_SEC = 60             # 휴식 시간 최소
+MAX_REST_SEC = 120            # 휴식 시간 최대
 
 class VolumeFarmer:
     def __init__(self):
