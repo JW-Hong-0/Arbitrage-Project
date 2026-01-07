@@ -176,3 +176,168 @@ client_session: <aiohttp.client.ClientSession object at 0x000002D0E598ED50>
 2026-01-07 02:06:31,691 - Unclosed connector
 connections: ['deque([(<aiohttp.client_proto.ResponseHandler object at 0x000002D0E59DD8B0>, 626168.1879265)])']
 connector: <aiohttp.connector.TCPConnector object at 0x000002D0E598E990>
+2026-01-07 11:47:51,346 - ==================================================
+2026-01-07 11:47:51,347 - 🚀 GRVT-Lighter Testnet 검증 시작
+2026-01-07 11:47:51,347 - ==================================================
+2026-01-07 11:47:51,347 - [설정 확인] GRVT_ENV: TESTNET, LIGHTER_ENV: TESTNET
+2026-01-07 11:47:51,347 - [설정 확인] DRY_RUN: False (False여야 실제 통신 가능)
+2026-01-07 11:47:51,347 - 
+🔵 [Lighter] 거래소 연결 테스트 중...
+2026-01-07 11:47:51,624 -    👉 잔고 조회 시도...
+2026-01-07 11:47:51,769 - Lighter account fetch failed: (400)
+Reason: Bad Request
+HTTP response headers: <CIMultiDictProxy('Content-Type': 'application/json; charset=utf-8', 'Content-Length': '41', 'Connection': 'keep-alive', 'Date': 'Wed, 07 Jan 2026 02:47:51 GMT', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Allow-Headers': 'Content-Type, Origin, X-CSRF-Token, Authorization, AccessToken, Token, Range', 'Access-Control-Allow-Methods': 'GET, HEAD, POST, PATCH, PUT, DELETE', 'Access-Control-Allow-Origin': '*', 'Access-Control-Expose-Headers': 'Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers', 'Access-Control-Max-Age': '86400', 'Vary': 'Accept-Encoding', 'X-Cache': 'Error from cloudfront', 'Via': '1.1 063ae6f7fa46f5008be6d8d645ec4ed2.cloudfront.net (CloudFront)', 'X-Amz-Cf-Pop': 'ICN80-P4', 'X-Amz-Cf-Id': 'R5A6nLQguTVOMKdeh8PtzNF6XkHklyrv60PUzW1G47xCxhl3MDKlhA==')>
+HTTP response body: code=20001 message='invalid param ' additional_properties={}
+
+2026-01-07 11:47:51,769 - Error fetching Lighter balance: (400)
+Reason: Bad Request
+HTTP response headers: <CIMultiDictProxy('Content-Type': 'application/json; charset=utf-8', 'Content-Length': '41', 'Connection': 'keep-alive', 'Date': 'Wed, 07 Jan 2026 02:47:51 GMT', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Allow-Headers': 'Content-Type, Origin, X-CSRF-Token, Authorization, AccessToken, Token, Range', 'Access-Control-Allow-Methods': 'GET, HEAD, POST, PATCH, PUT, DELETE', 'Access-Control-Allow-Origin': '*', 'Access-Control-Expose-Headers': 'Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers', 'Access-Control-Max-Age': '86400', 'Vary': 'Accept-Encoding', 'X-Cache': 'Error from cloudfront', 'Via': '1.1 063ae6f7fa46f5008be6d8d645ec4ed2.cloudfront.net (CloudFront)', 'X-Amz-Cf-Pop': 'ICN80-P4', 'X-Amz-Cf-Id': 'R5A6nLQguTVOMKdeh8PtzNF6XkHklyrv60PUzW1G47xCxhl3MDKlhA==')>
+HTTP response body: code=20001 message='invalid param ' additional_properties={}
+
+2026-01-07 11:47:51,769 -    ✅ 잔고 조회 성공: Equity=$0.00, Available=$0.00
+2026-01-07 11:47:51,770 -    👉 Ticker/Funding 조회 시도...
+2026-01-07 11:47:51,949 -    ✅ Ticker 조회 성공 (데이터 수신 완료)
+2026-01-07 11:47:51,950 - 
+🟠 [GRVT] 거래소 연결 테스트 중...
+2026-01-07 11:47:52,827 - get_cookie_with_expiration path='https://edge.testnet.grvt.io/auth/api_key/login' OK response cookie_value='NZWSFMBFHVZ76FCIPBONVP7GXHTEQXLPSG4FJMZ6JP7UE5I6ADO7TMXNAN6PQD4FK4ZMOWQWO45LXIYHAYV7XP54NX5E5IECUS2ERJQ' cookie_expiry=datetime.datetime(2026, 1, 8, 2, 47, 52) grvt_account_id='37sgkeQANAiEuMQBmAs5Km7rNvE'
+2026-01-07 11:47:53,718 -    👉 Ticker(BTC_USDT_Perp) 조회 시도...
+2026-01-07 11:47:53,718 -    ℹ️ Available Markets (First 5): ['AAVE_USDT_Perp', 'ADA_USDT_Perp', 'AI16Z_USDT_Perp', 'AIXBT_USDT_Perp', 'APEX_USDT_Perp']
+2026-01-07 11:47:53,968 -    ℹ️ Raw Ticker Data: {'event_time': '1767754073942726044', 'instrument': 'BTC_USDT_Perp', 'mark_price': '92879.641744901', 'index_price': '92910.769308004', 'last_price': '92888.1', 'last_size': '0.012', 'mid_price': '92888.15', 'best_bid_price': '92888.1', 'best_bid_size': '1.776', 'best_ask_price': '92888.2', 'best_ask_size': '8.201', 'funding_rate_8h_curr': '0.01', 'funding_rate_8h_avg': '0.01', 'interest_rate': '0.0', 'forward_price': '0.0', 'buy_volume_24h_b': '815.914', 'sell_volume_24h_b': '777.239', 'buy_volume_24h_q': '76036346.7617', 'sell_volume_24h_q': '72485658.9011', 'high_price': '94397.9', 'low_price': '84372.3', 'open_price': '93577.4', 'open_interest': '5720.123', 'long_short_ratio': '0.770833', 'funding_rate': '0.01', 'next_funding_time': '1767772800000000000'}
+2026-01-07 11:47:54,208 -    ✅ Ticker 조회 성공 (Funding Rate: 0.01)
+2026-01-07 11:47:54,208 - 
+==================================================
+2026-01-07 11:47:54,208 - 🏁 검증 절차 완료
+2026-01-07 11:47:54,209 - ==================================================
+2026-01-07 11:47:54,209 - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000298C53E5820>
+2026-01-07 11:47:54,209 - Unclosed connector
+connections: ['deque([(<aiohttp.client_proto.ResponseHandler object at 0x00000298C53DA150>, 3488.359)])']
+connector: <aiohttp.connector.TCPConnector object at 0x00000298C53E5790>
+2026-01-07 11:48:27,861 - ==================================================
+2026-01-07 11:48:27,861 - 🚀 GRVT-Lighter Testnet 검증 시작
+2026-01-07 11:48:27,861 - ==================================================
+2026-01-07 11:48:27,861 - [설정 확인] GRVT_ENV: TESTNET, LIGHTER_ENV: TESTNET
+2026-01-07 11:48:27,861 - [설정 확인] DRY_RUN: False (False여야 실제 통신 가능)
+2026-01-07 11:48:27,861 - 
+🔵 [Lighter] 거래소 연결 테스트 중...
+2026-01-07 11:48:28,014 -    👉 잔고 조회 시도...
+2026-01-07 11:48:28,081 - Lighter account fetch failed: (400)
+Reason: Bad Request
+HTTP response headers: <CIMultiDictProxy('Content-Type': 'application/json; charset=utf-8', 'Content-Length': '41', 'Connection': 'keep-alive', 'Date': 'Wed, 07 Jan 2026 02:48:28 GMT', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Allow-Headers': 'Content-Type, Origin, X-CSRF-Token, Authorization, AccessToken, Token, Range', 'Access-Control-Allow-Methods': 'GET, HEAD, POST, PATCH, PUT, DELETE', 'Access-Control-Allow-Origin': '*', 'Access-Control-Expose-Headers': 'Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers', 'Access-Control-Max-Age': '86400', 'Vary': 'Accept-Encoding', 'X-Cache': 'Error from cloudfront', 'Via': '1.1 063ae6f7fa46f5008be6d8d645ec4ed2.cloudfront.net (CloudFront)', 'X-Amz-Cf-Pop': 'ICN80-P4', 'X-Amz-Cf-Id': 'DxxMt0EDYQ6CTsj_UItKwnMyNAYPtsUFkw_fgD8gJ-Q8q-dTskhxRg==')>
+HTTP response body: code=20001 message='invalid param ' additional_properties={}
+
+2026-01-07 11:48:28,082 - Error fetching Lighter balance: (400)
+Reason: Bad Request
+HTTP response headers: <CIMultiDictProxy('Content-Type': 'application/json; charset=utf-8', 'Content-Length': '41', 'Connection': 'keep-alive', 'Date': 'Wed, 07 Jan 2026 02:48:28 GMT', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Allow-Headers': 'Content-Type, Origin, X-CSRF-Token, Authorization, AccessToken, Token, Range', 'Access-Control-Allow-Methods': 'GET, HEAD, POST, PATCH, PUT, DELETE', 'Access-Control-Allow-Origin': '*', 'Access-Control-Expose-Headers': 'Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers', 'Access-Control-Max-Age': '86400', 'Vary': 'Accept-Encoding', 'X-Cache': 'Error from cloudfront', 'Via': '1.1 063ae6f7fa46f5008be6d8d645ec4ed2.cloudfront.net (CloudFront)', 'X-Amz-Cf-Pop': 'ICN80-P4', 'X-Amz-Cf-Id': 'DxxMt0EDYQ6CTsj_UItKwnMyNAYPtsUFkw_fgD8gJ-Q8q-dTskhxRg==')>
+HTTP response body: code=20001 message='invalid param ' additional_properties={}
+
+2026-01-07 11:48:28,082 -    ✅ 잔고 조회 성공: Equity=$0.00, Available=$0.00
+2026-01-07 11:48:28,082 -    👉 Ticker/Funding 조회 시도...
+2026-01-07 11:48:28,191 -    ✅ Ticker 조회 성공 (데이터 수신 완료)
+2026-01-07 11:48:28,191 - 
+🟠 [GRVT] 거래소 연결 테스트 중...
+2026-01-07 11:48:29,050 - get_cookie_with_expiration path='https://edge.testnet.grvt.io/auth/api_key/login' OK response cookie_value='YROTMU5JXA4SKQOCKYT5J43YTYZQCBNYJPAVVMBU7TSYJCD4ALX5WKPBLL3ZYXTWL2TL52VQG6EVCGVBHPDIU6WO4ACZ2DJ7UMLTIPQ' cookie_expiry=datetime.datetime(2026, 1, 8, 2, 48, 29) grvt_account_id='37sgkeQANAiEuMQBmAs5Km7rNvE'
+2026-01-07 11:48:29,882 -    👉 Ticker(BTC_USDT_Perp) 조회 시도...
+2026-01-07 11:48:29,883 -    ℹ️ Available Markets (First 5): ['AAVE_USDT_Perp', 'ADA_USDT_Perp', 'AI16Z_USDT_Perp', 'AIXBT_USDT_Perp', 'APEX_USDT_Perp']
+2026-01-07 11:48:30,126 -    ℹ️ Raw Ticker Data: {'event_time': '1767754110088607778', 'instrument': 'BTC_USDT_Perp', 'mark_price': '92875.682151148', 'index_price': '92907.980083677', 'last_price': '92873.7', 'last_size': '0.04', 'mid_price': '92875.55', 'best_bid_price': '92873.7', 'best_bid_size': '8.194', 'best_ask_price': '92877.4', 'best_ask_size': '3.466', 'funding_rate_8h_curr': '0.01', 'funding_rate_8h_avg': '0.01', 'interest_rate': '0.0', 'forward_price': '0.0', 'buy_volume_24h_b': '817.001', 'sell_volume_24h_b': '779.619', 'buy_volume_24h_q': '76137300.4736', 'sell_volume_24h_q': '72706722.1346', 'high_price': '94397.9', 'low_price': '84372.3', 'open_price': '93577.4', 'open_interest': '5720.123', 'long_short_ratio': '0.770833', 'funding_rate': '0.01', 'next_funding_time': '1767772800000000000'}
+2026-01-07 11:48:30,369 -    ✅ Ticker 조회 성공 (Funding Rate: 0.01)
+2026-01-07 11:48:30,370 - 
+==================================================
+2026-01-07 11:48:30,370 - 🏁 검증 절차 완료
+2026-01-07 11:48:30,370 - ==================================================
+2026-01-07 11:48:30,370 - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000020F209A5E80>
+2026-01-07 11:48:30,370 - Unclosed connector
+connections: ['deque([(<aiohttp.client_proto.ResponseHandler object at 0x0000020F20996270>, 3524.671)])']
+connector: <aiohttp.connector.TCPConnector object at 0x0000020F209A5DF0>
+2026-01-07 11:49:18,462 - ==================================================
+2026-01-07 11:49:18,463 - 🚀 GRVT-Lighter Testnet 검증 시작
+2026-01-07 11:49:18,463 - ==================================================
+2026-01-07 11:49:18,463 - [설정 확인] GRVT_ENV: TESTNET, LIGHTER_ENV: TESTNET
+2026-01-07 11:49:18,463 - [설정 확인] DRY_RUN: False (False여야 실제 통신 가능)
+2026-01-07 11:49:18,463 - 
+🔵 [Lighter] 거래소 연결 테스트 중...
+2026-01-07 11:49:18,627 -    👉 잔고 조회 시도...
+2026-01-07 11:49:18,698 - ✅ Lighter Smart Account Discovery: Found active account at index 0
+2026-01-07 11:49:18,698 -    ✅ 잔고 조회 성공: Equity=$1608542.01, Available=$1608542.01
+2026-01-07 11:49:18,698 -    👉 Ticker/Funding 조회 시도...
+2026-01-07 11:49:18,731 -    ✅ Ticker 조회 성공 (데이터 수신 완료)
+2026-01-07 11:49:18,731 - 
+🟠 [GRVT] 거래소 연결 테스트 중...
+2026-01-07 11:49:19,528 - get_cookie_with_expiration path='https://edge.testnet.grvt.io/auth/api_key/login' OK response cookie_value='3LRCYKMY4KJZDOZH6AEOFQYCF4N3F73IRM5PS3VEEOVDPOI5GRA5EL2ONGCS5SKSU5LE5EVDUYE4SM7WG5IDMOGI2JR4QVQDKC57PRY' cookie_expiry=datetime.datetime(2026, 1, 8, 2, 49, 19) grvt_account_id='37sgkeQANAiEuMQBmAs5Km7rNvE'
+2026-01-07 11:49:20,388 -    👉 Ticker(BTC_USDT_Perp) 조회 시도...
+2026-01-07 11:49:20,388 -    ℹ️ Available Markets (First 5): ['AAVE_USDT_Perp', 'ADA_USDT_Perp', 'AI16Z_USDT_Perp', 'AIXBT_USDT_Perp', 'APEX_USDT_Perp']
+2026-01-07 11:49:20,638 -    ℹ️ Raw Ticker Data: {'event_time': '1767754160500000000', 'instrument': 'BTC_USDT_Perp', 'mark_price': '92884.372512909', 'index_price': '92913.735176706', 'last_price': '92884.8', 'last_size': '0.124', 'mid_price': '92885.55', 'best_bid_price': '92885.3', 'best_bid_size': '0.084', 'best_ask_price': '92885.8', 'best_ask_size': '3.458', 'funding_rate_8h_curr': '0.01', 'funding_rate_8h_avg': '0.01', 'interest_rate': '0.0', 'forward_price': '0.0', 'buy_volume_24h_b': '820.208', 'sell_volume_24h_b': '779.619', 'buy_volume_24h_q': '76435159.213', 'sell_volume_24h_q': '72706722.1346', 'high_price': '94397.9', 'low_price': '84372.3', 'open_price': '93577.4', 'open_interest': '5720.123', 'long_short_ratio': '0.770833', 'funding_rate': '0.01', 'next_funding_time': '1767772800000000000'}
+2026-01-07 11:49:20,892 -    ✅ Ticker 조회 성공 (Funding Rate: 0.01)
+2026-01-07 11:49:20,892 - 
+==================================================
+2026-01-07 11:49:20,892 - 🏁 검증 절차 완료
+2026-01-07 11:49:20,892 - ==================================================
+2026-01-07 11:49:20,893 - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000200B1FC1CA0>
+2026-01-07 11:49:20,893 - Unclosed connector
+connections: ['deque([(<aiohttp.client_proto.ResponseHandler object at 0x00000200B1FB6270>, 3575.281)])']
+connector: <aiohttp.connector.TCPConnector object at 0x00000200B1FC1C10>
+2026-01-07 11:49:48,885 - ==================================================
+2026-01-07 11:49:48,885 - 🚀 GRVT-Lighter Testnet 검증 시작
+2026-01-07 11:49:48,885 - ==================================================
+2026-01-07 11:49:48,885 - [설정 확인] GRVT_ENV: TESTNET, LIGHTER_ENV: TESTNET
+2026-01-07 11:49:48,885 - [설정 확인] DRY_RUN: False (False여야 실제 통신 가능)
+2026-01-07 11:49:48,885 - 
+🔵 [Lighter] 거래소 연결 테스트 중...
+2026-01-07 11:49:49,035 -    👉 잔고 조회 시도...
+2026-01-07 11:49:49,102 - ✅ Lighter Smart Account Discovery: Found active account at index 0
+2026-01-07 11:49:49,103 -    ✅ 잔고 조회 성공: Equity=$1608581.98, Available=$1608581.98
+2026-01-07 11:49:49,103 -    👉 Ticker/Funding 조회 시도...
+2026-01-07 11:49:49,177 -    ✅ Ticker 조회 성공 (데이터 수신 완료)
+2026-01-07 11:49:49,178 - 
+🟠 [GRVT] 거래소 연결 테스트 중...
+2026-01-07 11:49:50,000 - get_cookie_with_expiration path='https://edge.testnet.grvt.io/auth/api_key/login' OK response cookie_value='QFUWFKGHWP2PTLCZTJ3U64O6X2X62MCK3KJFQIGRJPDHP73B4FEQJW3UMNJBTJFMDHZ5P5KVGOJUSHEEEGMPFOKWOW5QRWJ254GF6UA' cookie_expiry=datetime.datetime(2026, 1, 8, 2, 49, 49) grvt_account_id='37sgkeQANAiEuMQBmAs5Km7rNvE'
+2026-01-07 11:49:50,926 -    👉 Ticker(BTC_USDT_Perp) 조회 시도...
+2026-01-07 11:49:50,927 -    ℹ️ Available Markets (First 5): ['AAVE_USDT_Perp', 'ADA_USDT_Perp', 'AI16Z_USDT_Perp', 'AIXBT_USDT_Perp', 'APEX_USDT_Perp']
+2026-01-07 11:49:51,193 -    ℹ️ Raw Ticker Data: {'event_time': '1767754190500000000', 'instrument': 'BTC_USDT_Perp', 'mark_price': '92883.569548554', 'index_price': '92912.770652169', 'last_price': '92884.8', 'last_size': '0.124', 'mid_price': '92885.5', 'best_bid_price': '92885.2', 'best_bid_size': '4.123', 'best_ask_price': '92885.8', 'best_ask_size': '0.65', 'funding_rate_8h_curr': '0.01', 'funding_rate_8h_avg': '0.01', 'interest_rate': '0.0', 'forward_price': '0.0', 'buy_volume_24h_b': '820.208', 'sell_volume_24h_b': '779.619', 'buy_volume_24h_q': '76435159.213', 'sell_volume_24h_q': '72706722.1346', 'high_price': '94397.9', 'low_price': '84372.3', 'open_price': '93577.4', 'open_interest': '5720.123', 'long_short_ratio': '0.770833', 'funding_rate': '0.01', 'next_funding_time': '1767772800000000000'}
+2026-01-07 11:49:51,458 -    ✅ Ticker 조회 성공 (Funding Rate: 0.01)
+2026-01-07 11:49:51,458 -    👉 잔고 조회 시도...
+2026-01-07 11:49:51,459 - Error fetching GRVT balance: GrvtCcxt: this action requires a trading_account_id
+2026-01-07 11:49:51,459 -    ✅ 잔고 조회 성공: Equity=$0.00, Available=$0.00
+2026-01-07 11:49:51,459 -    ❌ [GRVT] 오류 발생: 'GrvtCcxt' object has no attribute 'close'
+2026-01-07 11:49:51,460 - 
+==================================================
+2026-01-07 11:49:51,461 - 🏁 검증 절차 완료
+2026-01-07 11:49:51,461 - ==================================================
+2026-01-07 11:49:51,461 - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000264E55F2060>
+2026-01-07 11:49:51,462 - Unclosed connector
+connections: ['deque([(<aiohttp.client_proto.ResponseHandler object at 0x00000264E55E6270>, 3605.687)])']
+connector: <aiohttp.connector.TCPConnector object at 0x00000264E55F1FD0>
+2026-01-07 12:07:34,576 - ==================================================
+2026-01-07 12:07:34,576 - 🚀 GRVT-Lighter Testnet 검증 시작
+2026-01-07 12:07:34,576 - ==================================================
+2026-01-07 12:07:34,577 - [설정 확인] GRVT_ENV: TESTNET, LIGHTER_ENV: TESTNET
+2026-01-07 12:07:34,577 - [설정 확인] DRY_RUN: False (False여야 실제 통신 가능)
+2026-01-07 12:07:34,577 - 
+🔵 [Lighter] 거래소 연결 테스트 중...
+2026-01-07 12:07:34,774 -    👉 잔고 조회 시도...
+2026-01-07 12:07:34,856 - ✅ Lighter Smart Account Discovery: Found active account at index 0
+2026-01-07 12:07:34,857 -    ✅ 잔고 조회 성공: Equity=$1610057.07, Available=$1610057.07
+2026-01-07 12:07:34,857 -    👉 Ticker/Funding 조회 시도...
+2026-01-07 12:07:35,150 -    ✅ Ticker 조회 성공 (데이터 수신 완료)
+2026-01-07 12:07:35,151 - 
+🟠 [GRVT] 거래소 연결 테스트 중...
+2026-01-07 12:07:35,744 - get_cookie_with_expiration path='https://edge.testnet.grvt.io/auth/api_key/login' OK response cookie_value='652EH37J6GUCMJC3EWTCHTOESYKS2OJ6T64BZ2JZO6TO7GOQRHK5KAON5Z3KIJEC6LS4QABXBYOE66OKK2ITQ3XIVAAZUDLAJQ35XLQ' cookie_expiry=datetime.datetime(2026, 1, 8, 3, 7, 35) grvt_account_id='37sgkeQANAiEuMQBmAs5Km7rNvE'
+2026-01-07 12:07:36,421 -    👉 Ticker(BTC_USDT_Perp) 조회 시도...
+2026-01-07 12:07:36,422 -    ℹ️ Available Markets (First 5): ['AAVE_USDT_Perp', 'ADA_USDT_Perp', 'AI16Z_USDT_Perp', 'AIXBT_USDT_Perp', 'APEX_USDT_Perp']
+2026-01-07 12:07:36,687 -    ℹ️ Raw Ticker Data: {'event_time': '1767755256535581953', 'instrument': 'BTC_USDT_Perp', 'mark_price': '92904.090555892', 'index_price': '92949.010680076', 'last_price': '92918.3', 'last_size': '0.037', 'mid_price': '92918.75', 'best_bid_price': '92918.3', 'best_bid_size': '1.045', 'best_ask_price': '92919.2', 'best_ask_size': '0.245', 'funding_rate_8h_curr': '0.01', 'funding_rate_8h_avg': '0.01', 'interest_rate': '0.0', 'forward_price': '0.0', 'buy_volume_24h_b': '908.656', 'sell_volume_24h_b': '843.598', 'buy_volume_24h_q': '84655502.8929', 'sell_volume_24h_q': '78649546.4518', 'high_price': '94397.9', 'low_price': '84372.1', 'open_price': '93657.4', 'open_interest': '5719.584', 'long_short_ratio': '0.770149', 'funding_rate': '0.01', 'next_funding_time': '1767772800000000000'}
+2026-01-07 12:07:36,950 -    ✅ Ticker 조회 성공 (Funding Rate: 0.01)
+2026-01-07 12:07:36,950 -    👉 잔고 조회 시도...
+2026-01-07 12:07:37,960 -    ✅ 잔고 조회 성공: Equity=$100000.00, Available=$100000.00
+2026-01-07 12:07:37,961 -    ❌ [GRVT] 오류 발생: 'GrvtCcxt' object has no attribute 'close'
+2026-01-07 12:07:37,963 - 
+==================================================
+2026-01-07 12:07:37,963 - 🏁 검증 절차 완료
+2026-01-07 12:07:37,964 - ==================================================
+2026-01-07 12:07:37,964 - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001F8DBB917C0>
+2026-01-07 12:07:37,965 - Unclosed connector
+connections: ['deque([(<aiohttp.client_proto.ResponseHandler object at 0x000001F8DBB86270>, 4671.437)])']
+connector: <aiohttp.connector.TCPConnector object at 0x000001F8DBB91BE0>

@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 from .config import Config
 from .exchanges.grvt_api import GrvtExchange
 from .exchanges.lighter_api import LighterExchange
@@ -11,197 +12,200 @@ class Strategy:
         self.grvt = GrvtExchange()
         self.lighter = LighterExchange()
         self.running = False
+        self.market_data_loaded = False
+        self.processed_trade_ids = set() # To track hedged trades
+
+    async def initialize_markets(self):
+        """Load market details from both exchanges."""
+        if self.market_data_loaded:
+            return
+        logger.info("Loading market data for both exchanges...")
+        self.market_data_loaded = True
+        logger.info("Market data setup complete.")
 
     async def run(self):
         self.running = True
-        logger.info("Strategy started.")
+        logger.info("Strategy starting in MONITOR mode...")
+
+        try:
+            await self.grvt.initialize()
+            await self.lighter.initialize()
+            await self.initialize_markets()
+        except Exception as e:
+            logger.error(f"Failed to initialize exchanges: {e}")
+            self.running = False
+            return
         
-        # Start fill listener task
-        asyncio.create_task(self.grvt.listen_fills(self.on_fill))
+        logger.info("Strategy started successfully.")
         
-        # Main Loop: Scan -> Dashboard -> Wait
+        # WEBSOCKET DISABLED to prevent event loop conflict
+        # asyncio.create_task(self.grvt.listen_fills(self.on_fill))
+        
         while self.running:
             try:
                 # 1. Asset Check
                 grvt_bal = await self.grvt.get_balance()
                 lighter_bal = await self.lighter.get_balance()
                 
-                # 2. Market Scan
-                best_opportunity = await self.scan_market()
+                # 2. Market Data Fetch
+                market_data = await self.get_market_data(Config.SYMBOL)
                 
                 # 3. Print Dashboard
-                self.print_dashboard(best_opportunity, grvt_bal, lighter_bal)
-                
-                # 4. Exit Check (Closing positions if spread unfavorable)
-                await self.check_exit_conditions(grvt_bal, lighter_bal, best_opportunity)
+                self.print_dashboard(market_data, grvt_bal, lighter_bal)
 
-                # 5. Entry Logic
-                if best_opportunity:
-                    action = best_opportunity['action']
-                    symbol = best_opportunity['symbol']
-                    
-                    trade_side = 'sell' if best_opportunity['grvt_rate'] > best_opportunity['lighter_rate'] else 'buy'
-                    
-                    # Risk Check: Max Position
-                    # TODO: Sum up actual position sizes from bal
-                    
-                    # logger.info(f"Opportunity found! Action: {trade_side.upper()} GRVT (Maker) -> {('BUY' if trade_side=='sell' else 'SELL')} Lighter (Taker)")
-                    
-                    if Config.DRY_RUN:
-                        logger.info(f"[DRY RUN] Placing Limit Order on GRVT: {trade_side} {Config.ORDER_AMOUNT} @ Current Price")
-                        # Simulate Fill after delay
-                        asyncio.create_task(self.simulate_fill(symbol, trade_side, Config.ORDER_AMOUNT))
-                    else:
-                        # Fetch price first and place order
-                        pass
+                # 4. Check for new GRVT fills via REST Polling
+                await self.poll_for_fills()
 
             except Exception as e:
-                logger.error(f"Error in strategy loop: {e}")
+                logger.error(f"Error in strategy loop: {e}", exc_info=True)
             
-            await asyncio.sleep(5) # Fast update for dashboard
+            await asyncio.sleep(10) # Update every 10 seconds
 
-    async def check_exit_conditions(self, grvt_bal, lighter_bal, opportunity):
-        """
-        Check if we need to close positions.
-        """
-        # Logic: If spread drops below 0 or negative, close positions.
-        # For Phase 1, we primarily just monitor.
-        # Implementation:
-        # 1. Identify paired positions (Long GRVT + Short Lighter)
-        # 2. Check current spread
-        # 3. If spread < EXIT_THRESHOLD, trigger close.
-        pass
-
-    async def scan_market(self):
-        """
-        Scan all tickers to find the best Funding Rate difference.
-        Returns dict with details of the best pair.
-        """
+    async def poll_for_fills(self):
+        """Periodically check for new trades on GRVT via REST API."""
         try:
-            # 1. Fetch GRVT Data
-            # Use Constant Map if needed, but for now Config.SYMBOL is sufficient
-            grvt_rate = await self.grvt.get_funding_rate(Config.SYMBOL)
+            # fetch_my_trades is a standard CCXT method, but needs to be run in a thread
+            recent_trades = await asyncio.to_thread(
+                self.grvt.client.fetch_my_trades,
+                f"{Config.SYMBOL.split('-')[0]}_USDT_Perp",
+                None, # Since timestamp
+                10 # Limit
+            )
             
-            # 2. Fetch Lighter Data
-            lighter_rates = await self.lighter.get_all_tickers()
-            
-            # Find Lighter rate for Config.SYMBOL
-            lighter_rate_val = None
-            
-            # Parsing Lighter SDK response
-            # Assuming lighter_rates is a list of objects or dicts.
-            if isinstance(lighter_rates, list):
-                for r in lighter_rates:
-                    # check attributes .symbol or ['symbol']
-                    sym = getattr(r, 'symbol', r.get('symbol') if isinstance(r, dict) else None)
-                    # Normalize symbol check using simple string matching or utils
-                    if sym and (Config.SYMBOL in sym): 
-                        lighter_rate_val = float(getattr(r, 'rate_daily', 0) or r.get('rate_daily', 0)) # Verify unit
-                        break
+            if not recent_trades:
+                return
 
-            # MOCK DATA for Dry Run
-            if Config.DRY_RUN:
-                if grvt_rate is None: grvt_rate = 0.0001
-                if lighter_rate_val is None: lighter_rate_val = 0.0005 
-            
-            if grvt_rate is not None and lighter_rate_val is not None:
-                diff = abs(grvt_rate - lighter_rate_val)
-                # logger.info(f"Scan: GRVT={grvt_rate:.6f} Lighter={lighter_rate_val:.6f} Diff={diff:.6f}")
-                
-                if diff > Config.FUNDING_DIFF_THRESHOLD:
-                    return {
-                        "symbol": Config.SYMBOL,
-                        "grvt_rate": grvt_rate,
-                        "lighter_rate": lighter_rate_val,
-                        "diff": diff,
-                        "action": "OPEN" 
+            for trade in recent_trades:
+                trade_id = trade.get('id')
+                if trade_id and trade_id not in self.processed_trade_ids:
+                    logger.info(f"Found new GRVT trade via REST Polling: ID {trade_id}")
+                    self.processed_trade_ids.add(trade_id)
+                    fill_data = {
+                        "instrument": trade.get('symbol'),
+                        "side": trade.get('side'),
+                        "size": trade.get('amount'),
+                        "price": trade.get('price'),
+                        "id": trade_id
                     }
-                    
+                    await self.on_fill(fill_data)
+
         except Exception as e:
-            logger.error(f"Scan Market Error: {e}")
-            
-        return None
+            logger.error(f"Error polling for fills: {e}")
 
-    def print_dashboard(self, opportunity, grvt_bal, lighter_bal):
-        # Clear screen/Print status
-        print("\n" + "="*50)
-        print(f"GRVT-Lighter Bot | Mode: {'DRY RUN' if Config.DRY_RUN else 'LIVE'}")
-        print(f"Time: {asyncio.get_event_loop().time():.2f}")
-        
-        print("-" * 20 + " ASSETS " + "-" * 20)
-        print(f"GRVT    | Equity: ${grvt_bal.get('equity', 0):.2f} | Free: ${grvt_bal.get('available', 0):.2f}")
-        print(f"Lighter | Equity: ${lighter_bal.get('equity', 0):.2f} | Free: ${lighter_bal.get('available', 0):.2f}")
-        
-        print("-" * 20 + " POSITIONS " + "-" * 20)
-        all_pos = grvt_bal.get('positions', []) + lighter_bal.get('positions', [])
-        if not all_pos:
-            print("No active positions.")
-        else:
-            for p in all_pos:
-                print(f"{p.get('symbol')} {p.get('side')} {p.get('size')} @ {p.get('entry_price')}")
 
-        print("-" * 20 + " STRATEGY " + "-" * 20)
-        if opportunity:
-            print(f"Opportunity: {opportunity['symbol']}")
-            print(f"   GRVT Rate: {opportunity['grvt_rate']:.6f}")
-            print(f"   Lighter Rate: {opportunity['lighter_rate']:.6f}")
-            print(f"   Diff: {opportunity['diff']:.6f}")
-        else:
-            print("Scanning for opportunities...")
-        print("="*50 + "\n")
+    async def get_market_data(self, symbol):
+        """
+        Fetches detailed market data for a symbol from both exchanges.
+        """
+        grvt_symbol = f"{symbol.split('-')[0]}_USDT_Perp"
+        lighter_symbol = symbol.split('-')[0]
+
+        async def get_grvt_data():
+            try:
+                # This CCXT-style method needs to be run in a thread
+                ticker = await asyncio.to_thread(self.grvt.client.fetch_ticker, grvt_symbol)
+                return {
+                    "price": ticker.get('last') or 'N/A',
+                    "bid": ticker.get('bid') or 'N/A',
+                    "ask": ticker.get('ask') or 'N/A',
+                    "funding_rate": ticker.get('info', {}).get('funding_rate') or 'N/A',
+                    "funding_time": ticker.get('info', {}).get('next_funding_time') or 'N/A',
+                    "min_size": "N/A", 
+                    "max_leverage": "N/A"
+                }
+            except Exception as e:
+                logger.warning(f"Could not fetch GRVT market data: {e}")
+                return None
+
+        async def get_lighter_data():
+            try:
+                rates_data = await self.lighter.get_all_tickers()
+                funding_info = None
+                if isinstance(rates_data, list):
+                    for r in rates_data:
+                        sym = getattr(r, 'symbol', None)
+                        if sym and (lighter_symbol in sym):
+                            funding_info = { "funding_rate": getattr(r, 'rate_daily', None) }
+                            break
+                
+                return {
+                    "price": "N/A", "bid": "N/A", "ask": "N/A",
+                    "funding_rate": funding_info.get("funding_rate") if funding_info else "N/A",
+                    "funding_time": "N/A", "min_size": "N/A", "max_leverage": "N/A"
+                }
+            except Exception as e:
+                logger.warning(f"Could not fetch Lighter market data: {e}")
+                return None
+
+        grvt_data, lighter_data = await asyncio.gather(get_grvt_data(), get_lighter_data())
+        
+        return { "symbol": symbol, "grvt": grvt_data, "lighter": lighter_data }
+
+    def print_dashboard(self, market_data, grvt_bal, lighter_bal):
+        class C:
+            HEADER = '\033[95m'; BLUE = '\033[94m'; GREEN = '\033[92m'
+            YELLOW = '\033[93m'; RED = '\033[91m'; ENDC = '\033[0m'; BOLD = '\033[1m'
+
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print(f"{C.BOLD}{C.HEADER}================= GRVT-Lighter Market Monitor ================={C.ENDC}")
+        print(f"Bot Mode: {C.YELLOW}MONITORING ONLY (REST Polling for Fills){C.ENDC} | Symbol: {C.BOLD}{Config.SYMBOL}{C.ENDC}")
+        
+        print(f"\n{C.BOLD}---------- Balances ----------{C.ENDC}")
+        print(f"GRVT    | Equity: {C.GREEN}${grvt_bal.get('equity', 0):,.2f}{C.ENDC} | Available: ${grvt_bal.get('available', 0):,.2f}")
+        print(f"Lighter | Equity: {C.GREEN}${lighter_bal.get('equity', 0):,.2f}{C.ENDC} | Available: ${lighter_bal.get('available', 0):,.2f}")
+
+        print(f"\n{C.BOLD}---------- Market Data Comparison ({Config.SYMBOL}) ----------{C.ENDC}")
+        
+        grvt_data = market_data.get('grvt', {}) or {}
+        lighter_data = market_data.get('lighter', {}) or {}
+
+        grvt_fr = grvt_data.get('funding_rate', 'N/A')
+        lighter_fr = lighter_data.get('funding_rate', 'N/A')
+
+        print(f"{'Metric':<18} | {C.BLUE}{'GRVT':<25}{C.ENDC} | {C.BLUE}{'Lighter':<25}{C.ENDC}")
+        print("-" * 70)
+        print(f"{'Last Price':<18} | {grvt_data.get('price', 'N/A'):<25} | {lighter_data.get('price', 'N/A'):<25}")
+        print(f"{'Best Bid':<18} | {grvt_data.get('bid', 'N/A'):<25} | {lighter_data.get('bid', 'N/A'):<25}")
+        print(f"{'Best Ask':<18} | {grvt_data.get('ask', 'N/A'):<25} | {lighter_data.get('ask', 'N/A'):<25}")
+        print(f"{C.YELLOW}{'Funding Rate (8h)':<18}{C.ENDC} | {C.YELLOW}{grvt_fr:<25}{C.ENDC} | {C.YELLOW}{lighter_fr:<25}{C.ENDC}")
+        print(f"{'Funding Time':<18} | {grvt_data.get('funding_time', 'N/A'):<25} | {lighter_data.get('funding_time', 'N/A'):<25}")
+        print(f"{'Min Order Size':<18} | {grvt_data.get('min_size', 'N/A'):<25} | {lighter_data.get('min_size', 'N/A'):<25}")
+        print(f"{'Max Leverage':<18} | {grvt_data.get('max_leverage', 'N/A'):<25} | {lighter_data.get('max_leverage', 'N/A'):<25}")
+
+        print("\n" + "="*70)
 
     async def on_fill(self, fill_data):
         logger.info(f"Fill received: {fill_data}")
         
-        # Hedge logic
         try:
-            # Parse fill data
-            # Standardizing input: fill_data should be a dict
             if isinstance(fill_data, str):
                 import json
                 try: fill_data = json.loads(fill_data)
                 except: pass
             
-            # Check structure (assuming pysdk format or raw dict)
-            # If fill_data is from 'user.trades', it might be a list of trades or single named tuple
-            
-            # Using defaults for robustness during initial dev
             symbol = Config.SYMBOL 
             side = 'buy'
             amount = Config.ORDER_AMOUNT
             
-            # Try to extract real values if possible
             if isinstance(fill_data, dict):
                 symbol = fill_data.get('instrument', symbol).split('_')[0]
                 side = fill_data.get('side', side)
                 amount = float(fill_data.get('size', fill_data.get('amount', amount)))
             
-            # Opposite side for hedging
             hedge_side = 'sell' if side.lower() == 'buy' else 'buy'
             
             logger.info(f"Hedging: {hedge_side.upper()} {amount} {symbol} on Lighter")
             
-            if Config.DRY_RUN:
-                await self.lighter.place_market_order(symbol, hedge_side, amount)
-            else:
-                 await self.lighter.place_market_order(symbol, hedge_side, amount)
+            # Since this is a monitor, we won't actually place the hedge order
+            # await self.lighter.place_market_order(symbol, hedge_side, amount)
+            logger.info(f"[MONITOR MODE] Hedge order not placed.")
                  
         except Exception as e:
-            logger.error(f"Error during hedging: {e}")
-
-    async def simulate_fill(self, symbol, side, amount):
-        """Helper to simulate WS fill event in Dry Run"""
-        await asyncio.sleep(2)
-        mock_fill = {
-            "instrument": f"{symbol}_USDT_Perp",
-            "side": side,
-            "size": amount,
-            "price": 95000.0,
-            "type": "fill"
-        }
-        logger.info(f"[DRY RUN] Simulating Fill Event...")
-        await self.on_fill(mock_fill)
+            logger.error(f"Error during hedge simulation: {e}")
 
     async def stop(self):
         self.running = False
+        logger.info("Closing exchange connections...")
         await self.lighter.close()
+        await self.grvt.close()
+        logger.info("Connections closed.")

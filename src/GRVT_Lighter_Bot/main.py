@@ -3,32 +3,40 @@ import os
 
 # Allow running as script
 if __name__ == "__main__":
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-
-# Add SDK paths
-SDK_ROOT = r"d:\4_Personal_HONG\Python\VIBE_CODING\sdks"
-sys.path.append(os.path.join(SDK_ROOT, "grvt-pysdk", "src"))
-# Try both potential locations for lighter
-sys.path.append(os.path.join(SDK_ROOT, "lighter-python")) 
-sys.path.append(os.path.join(SDK_ROOT, "lighter-python", "src"))
+    # This path adjustment is crucial for running as a module from the project root
+    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    if project_root not in sys.path:
+        sys.path.append(project_root)
 
 import asyncio
 import logging
-from .strategy import Strategy
-from .config import Config
+from src.GRVT_Lighter_Bot.strategy import Strategy
+from src.GRVT_Lighter_Bot.config import Config
 
 # Setup logging
-logging.basicConfig(level=getattr(logging, Config.LOG_LEVEL))
+logging.basicConfig(level=getattr(logging, Config.LOG_LEVEL, "INFO"),
+                    format='%(asctime)s - %(levelname)s - %(message)s',
+                    stream=sys.stdout)
 logger = logging.getLogger(__name__)
 
 async def main():
     logger.info("Starting GRVT-Lighter Bot...")
     strategy = Strategy()
     try:
+        # The run method now contains the initialization logic
         await strategy.run()
     except KeyboardInterrupt:
-        logger.info("Stopping...")
+        logger.info("Keyboard interrupt received. Stopping...")
+    except Exception as e:
+        logger.error(f"An unexpected error occurred in main: {e}", exc_info=True)
+    finally:
+        logger.info("Shutting down strategy...")
         await strategy.stop()
 
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        # To catch errors during asyncio.run itself
+        print(f"Failed to run asyncio event loop: {e}")

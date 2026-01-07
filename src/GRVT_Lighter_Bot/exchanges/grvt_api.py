@@ -28,11 +28,17 @@ class GrvtExchange:
             parameters={
                 "api_key": Config.GRVT_API_KEY,
                 "private_key": Config.GRVT_PRIVATE_KEY,
-                "sub_account_id": Config.GRVT_TRADING_ACCOUNT_ID,
+                "trading_account_id": Config.GRVT_TRADING_ACCOUNT_ID,
             }
         )
         self._ws_running = False
         
+    async def initialize(self):
+        """Asynchronous initializer for API consistency."""
+        # GRVT's client is initialized synchronously, so this is a placeholder.
+        logger.info("GrvtExchange initialized.")
+        pass
+
     async def get_funding_rate(self, symbol: str):
         """
         Fetch funding rate for the symbol.
@@ -149,7 +155,7 @@ class GrvtExchange:
                 params = {
                     "api_key": Config.GRVT_API_KEY,
                     "private_key": Config.GRVT_PRIVATE_KEY,
-                    "sub_account_id": Config.GRVT_TRADING_ACCOUNT_ID,
+                    "trading_account_id": Config.GRVT_TRADING_ACCOUNT_ID,
                 }
                 
                 self.ws = GrvtCcxtWS(
@@ -173,3 +179,15 @@ class GrvtExchange:
             except Exception as e:
                 logger.error(f"GRVT WS Error: {e}")
                 await asyncio.sleep(5)
+
+    async def close(self):
+        """Gracefully close the underlying client session."""
+        self._ws_running = False
+        if hasattr(self, 'ws') and self.ws:
+            # Add logic to close ws if the sdk supports it
+            pass
+        if self.client and hasattr(self.client, '_session') and self.client._session:
+            if not self.client._session.closed:
+                await self.client._session.close()
+                logger.info("GRVT client session closed.")
+

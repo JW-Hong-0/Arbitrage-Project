@@ -87,22 +87,13 @@ async def main():
              logger.info(f"   ✅ Ticker 조회 성공 (Funding Rate: {funding_rate})")
         else:
              logger.warning("   ⚠️ Ticker 데이터 조회 실패 (None 반환)")
-
-        # Balance (Wait, GrvtExchange might not have get_balance implemented yet? Checking report...)
-        # Report said: "GRVT.. 잔고 조회 구현 완료" in strategy.py context or similar. 
-        # Checking grvt_api.py source again... it didn't strictly show get_balance in the snippet I saw earlier.
-        # Let's check if it exists or I need to add it. 
-        # I saw get_funding_rate and get_all_tickers. 
-        # The project_status_report said "GRVT... 잔고 조회 구현 완료".
-        # If it's missing in my view, I might fail here. 
-        # But let's assume it's there or part of the `client` access.
         
-        # Actually, let's look at grvt_api.py again in previous turn... 
-        # I only saw get_funding_rate, get_all_tickers. I truncated the file.
-        # I will try to call get_token_balance if it exists in grvt_ccxt.
+        # Balance Check
+        logger.info("   👉 잔고 조회 시도...")
+        balance = await grvt.get_balance()
+        logger.info(f"   ✅ 잔고 조회 성공: Equity=${balance.get('equity', 0):.2f}, Available=${balance.get('available', 0):.2f}")
         
-        # For now, let's try to just fetch tickers as a primary connectivity test.
-        # If I want to be safe, I'll rely on what I saw.
+        await grvt.client.close()
         
     except Exception as e:
         logger.error(f"   ❌ [GRVT] 오류 발생: {e}")

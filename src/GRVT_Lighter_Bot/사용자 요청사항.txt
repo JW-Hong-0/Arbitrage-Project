@@ -1,0 +1,17 @@
+D:\4_Personal_HONG\Python\VIBE_CODING\Arbitrage-Project 폴더의 GRVT-Lighter 크로스 헷징 전략 보고서.txt를 구현하고 있어
+현재까지 진행된 프로젝트는 D:\4_Personal_HONG\Python\VIBE_CODING\Arbitrage-Project\src\GRVT_Lighter_Bot 안에 있어.
+진행 사항에 대해서는 project_status_report_V2.txt 안에 정리되어 있어.
+
+어제까지 확인했을 때 테스트넷 잔고 및 기타 로직이 불안정했던 것을 보여.
+D:\4_Personal_HONG\Python\VIBE_CODING\Arbitrage-Project 폴더 내의 README.md를 읽어보면 D:\4_Personal_HONG\Python\VIBE_CODING\Arbitrage-Project\versions 안에 있는 프로그램들의 진행사항이 있어
+해당 폴더의 Arbitrage_V01_5 프로젝트를 보면 GRVT와 Lighter의 웹소켓 연결 및 매수 매도 로직이 이미 있을거야
+D:\4_Personal_HONG\Python\VIBE_CODING\sdks 안에 보면 GRVT와 Lighter의 파이썬 sdks를 다운 받아놨어.
+
+우선은 project_status_report_V2.txt의 진행사항과 GRVT-Lighter 크로스 헷징 전략 보고서.txt를 보고 현재 추가로 구현되어야 하거나 테스트가 필요한 사항들에 대해 플랜을 만들어줘
+내 생각에는 로직의 안정성 테스트를 위해 아래의 과정이 검토가 필요할 것 같아
+1. 각각의 거래소 웹소켓 연결 및 가격 & 펀딩비 모니터링이 원활한지 <- 메인넷 활용
+2. 각각의 거래소의 잔고 및 보유 포지션 확인이 원활한지(테스트넷 또는 메인넷)
+3. 각각의 거래소에서 지정가 주문 및 시장가 주문, 포지션 정리가 원활한지.
+	지정가 주문을 입력 시에 해당 지정가 주문의 체결 여부 모니터링이 원활한지. (우선 테스트넷 활용)
+4. 상기 검토 이후 소액으로 실전 테스트
+	모니터링 환경 (CMD 또는 GUI), 엑셀 또는 텍스트 로그 (매매일지), 전략의 안정성 등
