@@ -1,0 +1,44 @@
+# GRVT-Lighter Arbitrage Bot - 진행 상황 보고서 (2026-01-08)
+
+## 1. 프로젝트 개요
+GRVT와 Lighter 거래소 간의 차익거래를 위한 봇 개발 프로젝트입니다. 현재 **Testnet** 환경에서 시세 모니터링 및 데이터 정합성 확보 단계에 있습니다.
+
+## 2. 현재 상태 요약
+- **Bot 모드**: MONITORING ONLY (체결 없이 데이터 수집 및 대시보드 출력)
+- **대상 심볼**: ETH-USDT
+- **실행 상태**: 봇 프로세스 정상 실행 중, 양쪽 거래소 연결 성공.
+
+## 3. 거래소별 구현 상세 및 완료 사항
+
+### A. GRVT (Testnet)
+- **연결**: GRVT SDK(`grvt-pysdk`) 및 CCXT 호환 레이어 사용.
+- **데이터 확보**:
+    - [x] **Price (Best Bid/Ask)**: 정상 수신.
+    - [x] **Funding Rate**: 정상 수신.
+    - [x] **Max Leverage**: API 응답 파싱 로직 수정으로 **50.0x** 정상 표시 확인.
+    - [x] **Balance**: 정상 조회.
+
+### B. Lighter (Testnet)
+- **연결**: Lighter Python SDK (`lighter-python`) 및 커스텀 WebSocket 클라이언트 병행 사용.
+- **데이터 확보**:
+    - [x] **Price**: `order_book_details` SDK 메서드를 통해 `last_trade_price` 확보 성공 (3500 UDST 등).
+    - [x] **Max Leverage**: 사용자 요청에 따라 기본값을 **50x**로 하드코딩/Fallback 처리 완료.
+    - [▲] **Funding Rate & Time**:
+        - 기존 REST API 한계로 **WebSocket (`wss://testnet.zklighter.elliot.ai/stream`)** 클라이언트 신규 구현 및 연동.
+        - `market_stats/0` 채널 구독 성공 로그 확인 (`Subscribed to market_stats/0`).
+        - *※ 대시보드 반영 지연 또는 데이터 파싱 디버깅 필요할 수 있음.*
+    - [▲] **Account Index**: "Account with index 3 not found" 경고 발생 중 (기능상 작동은 하나 수정 권장).
+
+## 4. 해결된 주요 이슈
+1. **Lighter Price N/A**: OrderBook depth가 아닌 `OrderBookDetails`에서 체결가를 가져오도록 수정하여 해결.
+2. **GRVT Leverage 10 -> 50**: API 응답 필드 `max_leverage` 사용으로 교체.
+3. **Lighter Funding Info**: SDK 부재로 인한 WebSocket 직접 구현으로 전환.
+
+## 5. 향후 계획 (Next Steps)
+1. **Lighter WS 데이터 검증**: 대시보드에 Funding Rate/Time이 안정적으로 갱신되는지 시각적 확인.
+2. **Account Index 경고 해결**: 설정 파일(`API_KEY_INDEX`)과 실제 계정 상태 일치 작업.
+3. **주문 테스트**: 모니터링 모드 해제 후 소액 주문(Limit/Market) 체결 테스트.
+4. **전략 로직 검증**: 헷징 및 차익 포착 로직 시뮬레이션.
+
+## 6. 비고
+현재 봇 코드는 `Legacy Code`와 `New SDK Implementation`이 혼재되어 정리될 필요가 있으나, 기능 구현을 우선시하고 있습니다. WebSocket 연결은 성공했으므로 데이터가 곧 UI에 반영될 것으로 예상됩니다.

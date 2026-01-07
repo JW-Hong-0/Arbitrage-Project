@@ -34,7 +34,7 @@ class Config:
     # Strategy Settings
     DRY_RUN = False # Set to FALSE for actual Testnet testing
     LIGHTER_AMOUNT_SCALAR = 10000 # 0.0001 ETH/BTC unit? specific to Lighter
-    SYMBOL = "BTC-USDT" # Valid symbol for both (mapped internally)
+    SYMBOL = "ETH-USDT" # Valid symbol for both (mapped internally)
     ORDER_AMOUNT = 0.001
     MAX_POSITION = 0.1
     SPREAD_BPS = 5 # 0.05%

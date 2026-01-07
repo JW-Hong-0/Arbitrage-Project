@@ -10,16 +10,25 @@ if __name__ == "__main__":
 
 import asyncio
 import logging
+import sys
+from datetime import datetime
 from src.GRVT_Lighter_Bot.strategy import Strategy
 from src.GRVT_Lighter_Bot.config import Config
 
-# Setup logging
-logging.basicConfig(level=getattr(logging, Config.LOG_LEVEL, "INFO"),
-                    format='%(asctime)s - %(levelname)s - %(message)s',
-                    stream=sys.stdout)
+# Setup logging to both file and console
+log_filename = f"debug_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+logging.basicConfig(
+    level=getattr(logging, Config.LOG_LEVEL, "INFO"),
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(log_filename),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
 logger = logging.getLogger(__name__)
 
 async def main():
+    logger.info(f"Logging to file: {log_filename}")
     logger.info("Starting GRVT-Lighter Bot...")
     strategy = Strategy()
     try:

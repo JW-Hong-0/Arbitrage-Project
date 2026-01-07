@@ -20,6 +20,14 @@ class Utils:
         return base
 
     @staticmethod
+    def to_grvt_symbol(symbol: str) -> str:
+        """
+        Converts 'BTC-USDT' to 'BTC_USDT_Perp'
+        """
+        base = symbol.split('-')[0]
+        return f"{base}_USDT_Perp"
+
+    @staticmethod
     def quantize_amount(amount: float, tick_size: float) -> float:
         """
         Rounds down amount to the nearest tick_size.
