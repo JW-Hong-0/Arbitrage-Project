@@ -41,12 +41,13 @@ class GrvtExchange:
         logger.info("GrvtExchange initialized.")
         pass
 
-    def load_market_rules(self):
-        """Loads market trading rules by reading the .markets attribute."""
+    def load_market_rules(self) -> set:
+        """Loads market trading rules and returns a set of available base symbols."""
         logger.info("[GRVT] Attempting to load market rules...")
+        available_symbols = set()
         if not self.client:
             logger.error("❌ [GRVT] Aborting load_market_rules: client is not initialized.")
-            return
+            return available_symbols
 
         try:
             # Check if markets are already populated
@@ -61,18 +62,21 @@ class GrvtExchange:
 
             if not markets_to_parse:
                 logger.error("❌ [GRVT] No market data found in either .markets attribute or load_markets() call.")
-                return
+                return available_symbols
 
             for symbol, market in markets_to_parse.items():
-                base = symbol.split('/')[0]
+                base = symbol.split('_')[0]
+                available_symbols.add(base)
                 self.market_rules[base] = {
-                    'min_size': market.get('limits', {}).get('amount', {}).get('min'),
+                    'min_size': market.get('min_size'), # Corrected based on user-provided API docs
                     'max_leverage': market.get('limits', {}).get('leverage', {}).get('max', 20),
                 }
             logger.info(f"✅ [GRVT] {len(self.market_rules)} market rules loaded.")
             logger.info(f"[GRVT] Loaded rule keys: {list(self.market_rules.keys())}")
         except Exception as e:
             logger.error(f"❌ [GRVT] Failed to parse market rules: {e}", exc_info=True)
+        
+        return available_symbols
 
     async def get_funding_rate(self, symbol: str):
         """
@@ -218,92 +222,87 @@ class GrvtExchange:
 
     async def get_ticker_info(self, symbol):
         """
-        Retrieves ticker information including leverage and min size.
-        Uses fetch_ticker for price/funding, and cached markets for limits.
+        Retrieves ticker information including min_qty and leverage details.
         """
         try:
             grvt_symbol = Utils.to_grvt_symbol(symbol)
-            
-            info = {
-                "symbol": symbol,
-                "grvt_symbol": grvt_symbol,
-                "min_qty": None,
-                "max_leverage": None,
-                "tick_size": None
-            }
+            base_symbol = symbol.split('-')[0]
 
-            # 1. Get Limits from Market Structure (Instrument Info)
-            if hasattr(self.client, 'markets') and self.client.markets and grvt_symbol in self.client.markets:
-                m = self.client.markets[grvt_symbol]
-                info["min_qty"] = m.get('limits', {}).get('amount', {}).get('min')
-                # Fallback to key 'min_size' if custom structure
-                if info["min_qty"] is None:
-                     info["min_qty"] = m.get('min_size')
-                
-                info["tick_size"] = m.get('precision', {}).get('price') # CCXT standard
-                if info["tick_size"] is None:
-                     info["tick_size"] = m.get('tick_size')
+            # Get min_size from the pre-loaded rules, making a copy to prevent cache modification
+            info = self.market_rules.get(base_symbol, {}).copy()
+            info['min_qty'] = info.get('min_size')
 
-            # Leverage - fetch from specific endpoint as per user
+            # Leverage - fetch from specific endpoint as per user docs
             try:
                 acc_id = self.client.get_trading_account_id()
                 payload = {"sub_account_id": acc_id}
                 
-                # Construct URL
                 base_url = "https://trades.grvt.io"
                 if "TESTNET" in str(self.client.env):
                     base_url = "https://trades.testnet.grvt.io"
                 
                 url = f"{base_url}/full/v1/get_all_initial_leverage"
                 
-                # Use client's internal method for auth post if available
                 if hasattr(self.client, '_auth_and_post'):
                     resp = await asyncio.to_thread(self.client._auth_and_post, url, payload=payload)
-                    # { "results": [{ "instrument": "...", "leverage": "10", ... }] }
                     results = resp.get('results', [])
                     target = next((r for r in results if r.get('instrument') == grvt_symbol), None)
                     if target:
-                        info["max_leverage"] = target.get('max_leverage') # Correct field
+                        info["max_leverage"] = target.get('max_leverage')
+                        info["current_leverage"] = target.get('leverage')
             except Exception as e:
-                logger.warning(f"Failed to fetch leverage via raw call: {e}")
-                
-            if info["max_leverage"] is None:
-                # Fallback to market info if available
-                info["max_leverage"] = m.get('limits', {}).get('leverage', {}).get('max')
+                logger.warning(f"Failed to fetch GRVT leverage via raw call: {e}")
                 
             return info
         except Exception as e:
             logger.error(f"Error fetching GRVT ticker info for {symbol}: {e}")
             return None
 
-    async def get_funding_info(self, symbol):
+    async def get_funding_interval(self, symbol: str) -> int | None:
         """
-        Fetches funding rate and time via REST.
+        Fetches the funding interval in hours using the official SDK method.
         """
         try:
             grvt_symbol = Utils.to_grvt_symbol(symbol)
-            # Fetch Ticker which contains funding info
-            ticker = self.client.fetch_ticker(grvt_symbol)
+            # Use the official SDK method to be more robust
+            history = await asyncio.to_thread(self.client.fetch_funding_rate_history, grvt_symbol, limit=1)
+            results = history.get('result', [])
+            if results and 'funding_interval_hours' in results[0]:
+                return int(results[0]['funding_interval_hours'])
+            return None
+        except Exception as e:
+            logger.warning(f"Could not fetch funding interval for {symbol}: {e}")
+            return None
+
+    async def get_funding_info(self, symbol):
+        """
+        Fetches funding rate and time via REST, and funding interval.
+        """
+        try:
+            grvt_symbol = Utils.to_grvt_symbol(symbol)
+            ticker_task = asyncio.to_thread(self.client.fetch_ticker, grvt_symbol)
+            interval_task = self.get_funding_interval(symbol)
             
-            # Map fields based on CCXT standard + GRVT specifics
-            # User provided: funding_rate, next_funding_time
+            ticker, interval = await asyncio.gather(ticker_task, interval_task)
+            
+            # The user-provided doc shows `next_funding_time` is in the ticker response
             return {
-                "funding_rate": ticker.get('fundingRate'), # CCXT normalized
-                "next_funding_time": ticker.get('nextFundingDateTime') or ticker.get('next_funding_time'), # CCXT usually provides this
-                "mark_price": ticker.get('markPrice') or ticker.get('mark_price')
+                "funding_rate": ticker.get('funding_rate'),
+                "next_funding_time": ticker.get('next_funding_time'),
+                "funding_interval": interval
             }
         except Exception as e:
-            # logger.warning(f"Error fetching GRVT funding info: {e}")
-            return {"funding_rate": None, "next_funding_time": None}
+            logger.warning(f"Error fetching GRVT funding info for {symbol}: {e}")
+            return {"funding_rate": None, "next_funding_time": None, "funding_interval": None}
 
     async def close(self):
         """Gracefully close the underlying client session."""
         self._ws_running = False
         if hasattr(self, 'ws') and self.ws:
-            # Add logic to close ws if the sdk supports it
+            # The GrvtCcxtWS class handles its own shutdown
             pass
         if self.client and hasattr(self.client, '_session') and self.client._session:
-            if not self.client._session.closed:
-                await self.client._session.close()
-                logger.info("GRVT client session closed.")
+            # This is a synchronous requests.Session, so no await
+            self.client._session.close()
+            logger.info("GRVT client session closed.")
 

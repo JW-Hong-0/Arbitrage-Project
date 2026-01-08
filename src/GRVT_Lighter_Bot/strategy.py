@@ -14,16 +14,19 @@ class Strategy:
         self.grvt = GrvtExchange()
         self.lighter = LighterExchange()
         self.running = False
-        self.processed_trade_ids = set()
+        self.symbols_to_monitor = set()
         self.trading_rules = {}
 
     async def load_trading_rules(self):
         """
-        Runs once at startup to fetch and store trading rules.
+        Runs once at startup to fetch and store trading rules for common symbols.
         """
-        if not hasattr(Config, 'SYMBOLS'): Config.SYMBOLS = [Config.SYMBOL]
-        
-        for symbol in Config.SYMBOLS:
+        if not self.symbols_to_monitor:
+            logger.warning("No common symbols found to load trading rules for.")
+            return
+
+        for symbol_base in self.symbols_to_monitor:
+             symbol = f"{symbol_base}-USDT" # Assuming all are USDT pairs for now
              logger.info(f"Loading trading rules for {symbol}...")
              
              # --- GRVT Rule Loading ---
@@ -31,13 +34,14 @@ class Strategy:
              grvt_rules = {
                  'min_size': grvt_info.get('min_qty', 'N/A') if grvt_info else 'N/A',
                  'max_leverage': grvt_info.get('max_leverage', 'N/A') if grvt_info else 'N/A',
+                 'current_leverage': grvt_info.get('current_leverage', 'N/A') if grvt_info else 'N/A',
              }
 
              # --- Lighter Rule Loading ---
              lighter_info = await self.lighter.get_ticker_info(symbol)
              lighter_rules = {
                  'min_size': lighter_info.get('min_qty', 'N/A') if lighter_info else 'N/A',
-                  'max_leverage': lighter_info.get('max_leverage', 'N/A') if lighter_info else 'N/A',
+                 'max_leverage': lighter_info.get('max_leverage', 'N/A') if lighter_info else 'N/A',
              }
              
              self.trading_rules[symbol] = {'grvt': grvt_rules, 'lighter': lighter_rules}
@@ -50,13 +54,31 @@ class Strategy:
         logger.info("Strategy starting in MONITOR mode...")
 
         try:
-            # Initialize exchanges, which now also loads market rules for GRVT
+            # 1. Initialize exchange clients
             await self.grvt.initialize()
             await self.lighter.initialize()
-            # Load trading rules for the specific symbol
+            
+            # 2. Discover common symbols automatically
+            grvt_symbols = self.grvt.load_market_rules()
+            lighter_symbols = await self.lighter.load_markets()
+            
+            # Find intersection and then exclude symbols from the config list
+            common_symbols = grvt_symbols.intersection(lighter_symbols)
+            if hasattr(Config, 'SYMBOL_EXCLUDE'):
+                self.symbols_to_monitor = {s for s in common_symbols if s not in Config.SYMBOL_EXCLUDE}
+            else:
+                self.symbols_to_monitor = common_symbols
+            
+            logger.info(f"Found {len(self.symbols_to_monitor)} common symbols to monitor: {self.symbols_to_monitor}")
+
+            # 3. Start WebSocket listeners
+            asyncio.create_task(self.lighter.start_ws())
+            
+            # 4. Load trading rules for the common symbols
             await self.load_trading_rules()
+
         except Exception as e:
-            logger.error(f"Failed to initialize exchanges or rules: {e}")
+            logger.error(f"Failed to initialize exchanges or rules: {e}", exc_info=True)
             self.running = False
             return
         
@@ -64,33 +86,24 @@ class Strategy:
         
         while self.running:
             try:
-                if not hasattr(Config, 'SYMBOLS'): Config.SYMBOLS = [Config.SYMBOL]
-                
-                os.system('cls' if os.name == 'nt' else 'clear') # Clear once per loop iteration
-                
+                # First, fetch all data (this takes time)
                 grvt_bal = await self.grvt.get_balance()
                 lighter_bal = await self.lighter.get_balance()
                 
-                # Fetch data for all symbols
                 dashboard_data = []
-                for symbol in Config.SYMBOLS:
+                for symbol_base in self.symbols_to_monitor:
+                    symbol = f"{symbol_base}-USDT"
                     md = await self.get_market_data(symbol)
                     dashboard_data.append(md)
                 
-                # Print Dashboard
+                # Now, clear the screen and print the new data instantly
+                os.system('cls' if os.name == 'nt' else 'clear')
                 self.print_dashboard(dashboard_data, grvt_bal, lighter_bal)
-                # Only poll for fills if we are TRADING (or implemented later). 
-                # For now, suppressing errors in Monitor mode or just running it safely.
-                # User config doesn't have explicit MODE variable, but main.py prints "MONITORING ONLY".
-                # We'll just wrap it strictly or skip if just monitoring. 
-                # Assuming 'MONITOR' is the goal for now.
-                # await self.poll_for_fills() 
-                pass
+
             except Exception as e:
                 logger.error(f"Error in strategy loop: {e}", exc_info=True)
             
             await asyncio.sleep(10)
-
     async def poll_for_fills(self):
         """Periodically check for new trades on GRVT via REST API using mapped symbols."""
         try:
@@ -118,170 +131,132 @@ class Strategy:
 
     async def get_market_data(self, symbol):
         base_symbol = symbol.split('-')[0]
-        # Using self.grvt.get_funding_info and existing client methods
         
-        # 1. GRVT
         async def get_grvt_data():
             try:
-                # Use gather to fetch ticker and funding if needed, or rely on fetch_ticker
-                # CCXT fetch_ticker sometimes includes funding, but let's be explicit
                 ticker_task = asyncio.to_thread(self.grvt.client.fetch_ticker, Utils.to_grvt_symbol(symbol))
-                funding_task = self.grvt.get_funding_info(symbol)
+                funding_info_task = self.grvt.get_funding_info(symbol)
+                ticker, funding_info = await asyncio.gather(ticker_task, funding_info_task)
                 
-                ticker, funding = await asyncio.gather(ticker_task, funding_task)
-                
+                raw_rate = funding_info.get('funding_rate')
                 return {
-                    "price": ticker.get('last_price') or 'N/A',
-                    "bid": ticker.get('best_bid_price') or 'N/A',
-                    "ask": ticker.get('best_ask_price') or 'N/A',
-                    "funding_rate": funding.get('funding_rate') if funding.get('funding_rate') is not None else (ticker.get('funding_rate') or 'N/A'),
-                    "funding_time": funding.get('next_funding_time') if funding.get('next_funding_time') is not None else 'N/A',
+                    "price": ticker.get('last_price'),
+                    "bid": ticker.get('best_bid_price'),
+                    "ask": ticker.get('best_ask_price'),
+                    "funding_rate": float(raw_rate) if raw_rate is not None else None,
+                    "funding_time": Utils.format_funding_time(funding_info.get('next_funding_time')),
+                    "funding_interval": funding_info.get('funding_interval')
                 }
             except Exception as e:
-                logger.warning(f"Could not fetch GRVT market data: {e}")
+                logger.warning(f"Could not fetch GRVT market data for {symbol}: {e}")
                 return None
 
-    async def get_market_data(self, symbol):
-        base_symbol = symbol.split('-')[0]
-        
-        # 1. GRVT
-        async def get_grvt_data():
-            try:
-                # Use gather to fetch ticker and funding if needed, or rely on fetch_ticker
-                # CCXT fetch_ticker sometimes includes funding, but let's be explicit
-                ticker_task = asyncio.to_thread(self.grvt.client.fetch_ticker, Utils.to_grvt_symbol(symbol))
-                funding_task = self.grvt.get_funding_info(symbol)
-                
-                ticker, funding = await asyncio.gather(ticker_task, funding_task)
-                
-                
-                # Format Data
-                fmt_rate = Utils.format_funding_rate(funding.get('funding_rate')) if funding.get('funding_rate') is not None else (Utils.format_funding_rate(ticker.get('funding_rate')) if ticker.get('funding_rate') else 'N/A')
-                fmt_time = Utils.format_funding_time(funding.get('next_funding_time')) if funding.get('next_funding_time') else 'N/A'
-
-                return {
-                    "price": ticker.get('last_price') or 'N/A',
-                    "bid": ticker.get('best_bid_price') or 'N/A',
-                    "ask": ticker.get('best_ask_price') or 'N/A',
-                    "funding_rate": fmt_rate,
-                    "funding_time": fmt_time,
-                }
-            except Exception as e:
-                logger.warning(f"Could not fetch GRVT market data: {e}")
-                return None
-
-        # 2. Lighter
         async def get_lighter_data():
             try:
-                # Try new market stats first
                 stats = await self.lighter.get_market_stats(symbol)
-                
                 if stats:
-                    # 'funding_rate' might be string like "0.0001"
-                    # 'next_funding_time' might be int timestamp (ms)
-                    fmt_rate = Utils.format_funding_rate(stats.get('funding_rate'))
-                    
-                    # Fix Funding Time: If timestamp is <= next hour, it might be current. 
-                    # Lighter updates every hour. If it shows 08:00 at 08:05, user wants 09:00.
-                    # We will simply add 1h (3600s) if we assume the API returns 'current/last' funding time.
-                    # Based on observation: API returned 08:00 at 08:01. So it returns 'start of current period'.
-                    # User likely wants 'End of current period / Next Disbursement'.
-                    ts = stats.get('next_funding_time')
-                    if ts:
-                        # Simple heuristic: Add 1h (3600000 ms)
-                        # We should verify unit. Utils.format_funding_time handles s/ms/ns.
-                        # Assuming ms based on lighter_api 1722337200000 example.
-                        # Adding 1h = 3600 * 1000 ms.
-                        ts = int(ts) + 3600000
-                    
-                    fmt_time = Utils.format_funding_time(ts)
-
-                    return {
-                        "price": stats.get('price', 'N/A'),
-                        "bid": stats.get('best_bid', 'N/A'),
-                        "ask": stats.get('best_ask', 'N/A'),
-                        "funding_rate": fmt_rate,
-                        "funding_time": fmt_time
-                    }
-                
-                # Fallback to direct OrderBook if Stats failed
-                logger.warning("Lighter Market Stats failed, falling back to OrderBook...")
-                s_base = SYMBOL_ALIASES.get(base_symbol, base_symbol)
-                mid = LIGHTER_MARKET_IDS.get(s_base)
-                
-                ob_url = f"https://testnet.zklighter.elliot.ai/api/v1/orderbook?market_id={mid}"
-                if Config.LIGHTER_ENV == "MAINNET":
-                     ob_url = f"https://api.lighter.xyz/api/v1/orderbook?market_id={mid}"
-
-                import aiohttp
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(ob_url) as resp:
-                        ob = await resp.json() if resp.status == 200 else {}
-
-                funding = await self.lighter.get_funding_info(symbol)
-                
-                ask = str(ob['asks'][0]['price']) if ob.get('asks') else 'N/A'
-                bid = str(ob['bids'][0]['price']) if ob.get('bids') else 'N/A'
-                price = ask # approx
-                
-                return {
-                    "price": price,
-                    "bid": bid,
-                    "ask": ask,
-                    "funding_rate": funding.get('funding_rate', 'N/A'),
-                    "funding_time": funding.get('next_funding_time', 'N/A')
-                }
+                    stats["funding_time"] = Utils.format_funding_time(stats.get('next_funding_time'))
+                return stats
             except Exception as e:
-                logger.warning(f"Could not fetch Lighter market data: {e}")
+                logger.warning(f"Could not fetch Lighter market data for {symbol}: {e}")
                 return {}
 
         grvt_data, lighter_data = await asyncio.gather(get_grvt_data(), get_lighter_data())
-        return {"symbol": symbol, "grvt": grvt_data, "lighter": lighter_data}
+
+        # Normalize funding rates and calculate difference
+        funding_diff = None
+        try:
+            grvt_rate = float(grvt_data.get('funding_rate', 0))
+            lighter_rate = float(lighter_data.get('funding_rate', 0))
+            grvt_interval = int(grvt_data.get('funding_interval', 1)) # Default to 1 to avoid ZeroDivisionError
+            
+            # Lighter is always 1-hour, so normalize it to GRVT's interval
+            normalized_lighter_rate = lighter_rate * grvt_interval
+            funding_diff = grvt_rate - normalized_lighter_rate
+        except (ValueError, TypeError):
+            pass # Handles cases where rates are None or N/A
+
+        return {"symbol": symbol, "grvt": grvt_data, "lighter": lighter_data, "funding_diff": funding_diff}
 
     def print_dashboard(self, dashboard_data_list, grvt_bal, lighter_bal):
-        # Header
         C = type('C', (), {'HEADER': '\033[95m', 'BLUE': '\033[94m', 'GREEN': '\033[92m', 'YELLOW': '\033[93m', 'RED': '\033[91m', 'ENDC': '\033[0m', 'BOLD': '\033[1m'})
         
-        print(f"{C.BOLD}{C.HEADER}================= GRVT-Lighter Market Monitor ================={C.ENDC}")
+        def color_rate(rate):
+            if rate is None: return f"{'N/A':>8}"
+            color = C.GREEN if rate > 0 else C.RED if rate < 0 else C.ENDC
+            return f"{color}{rate: >8.5f}{C.ENDC}"
+
+        print(f"{C.BOLD}{C.HEADER}================= GRVT-Lighter Funding Rate Monitor ================={C.ENDC}")
         print(f"Bot Mode: {C.YELLOW}MONITORING ONLY{C.ENDC}")
-        
         print(f"\n{C.BOLD}---------- Balances ----------{C.ENDC}")
         print(f"GRVT    | Equity: {C.GREEN}${grvt_bal.get('equity', 0):,.2f}{C.ENDC} | Available: ${grvt_bal.get('available', 0):,.2f}")
         print(f"Lighter | Equity: {C.GREEN}${lighter_bal.get('equity', 0):,.2f}{C.ENDC} | Available: ${lighter_bal.get('available', 0):,.2f}")
+        print("\n" + "="*78)
 
-        if not isinstance(dashboard_data_list, list):
-             dashboard_data_list = [dashboard_data_list]
+        # Header
+        header = (f"{'Symbol':<7} | {'GRVT Rate':>14} | {'Lighter Rate (Adj)':>20} | {'Diff (GRVT-Ltr)':>17} | {'Recommendation'}")
+        print(C.BOLD + header + C.ENDC)
+        print("-" * 78)
 
-        for market_data in dashboard_data_list:
-            symbol = market_data.get('symbol', 'UNKNOWN')
-            print(f"\n{C.BOLD}---------- Market Data Comparison ({symbol}) ----------{C.ENDC}")
+        # Data Rows
+        best_opportunity = {"symbol": None, "diff": 0, "grvt_rate": 0, "lighter_rate": 0}
+
+        for data in dashboard_data_list:
+            symbol_base = data.get('symbol', 'N/A').split('-')[0]
+            grvt_data = data.get('grvt', {})
+            lighter_data = data.get('lighter', {})
             
-            grvt_data = market_data.get('grvt') or {}
-            lighter_data = market_data.get('lighter') or {}
+            grvt_rate = grvt_data.get('funding_rate')
+            lighter_rate = lighter_data.get('funding_rate')
+            grvt_interval = grvt_data.get('funding_interval', 1)
+
+            # Normalize Lighter rate for comparison
+            try:
+                norm_lighter_rate = float(lighter_rate) * int(grvt_interval)
+            except (ValueError, TypeError):
+                norm_lighter_rate = None
             
-            rules = self.trading_rules.get(symbol, {})
-            grvt_rules = rules.get('grvt', {})
-            lighter_rules = rules.get('lighter', {})
+            funding_diff = data.get('funding_diff')
 
-            def get(data, key, default='N/A'): return data.get(key, default) or default
+            # Track best opportunity
+            if funding_diff is not None and abs(funding_diff) > abs(best_opportunity['diff']):
+                best_opportunity['symbol'] = symbol_base
+                best_opportunity['diff'] = funding_diff
+                best_opportunity['grvt_rate'] = grvt_rate
+                best_opportunity['lighter_rate'] = lighter_rate
 
-            print(f"{'Metric':<18} | {C.BLUE}{'GRVT':<25}{C.ENDC} | {C.BLUE}{'Lighter':<25}{C.ENDC}")
-            print("-" * 70)
-            print(f"{'Last Price':<18} | {get(grvt_data, 'price'):<25} | {get(lighter_data, 'price'):<25}")
-            print(f"{'Best Bid':<18} | {get(grvt_data, 'bid'):<25} | {get(lighter_data, 'bid'):<25}")
-            print(f"{'Best Ask':<18} | {get(grvt_data, 'ask'):<25} | {get(lighter_data, 'ask'):<25}")
-            # Determine Funding Interval for GRVT
-            # LIT usually has 4h on GRVT? User said so. Others 8h.
-            interval_grvt = '4h' if 'LIT' in symbol else '8h'
-            interval_lighter = '1h'
 
-            print(f"{C.YELLOW}{'Funding Rate':<18}{C.ENDC} | {C.YELLOW}{get(grvt_data, 'funding_rate') + f' ({interval_grvt})':<25}{C.ENDC} | {C.YELLOW}{get(lighter_data, 'funding_rate') + f' ({interval_lighter})':<25}{C.ENDC}")
-            print(f"{'Funding Time':<18} | {get(grvt_data, 'funding_time', 'N/A'):<25} | {get(lighter_data, 'funding_time', 'N/A'):<25}")
-            print(f"{'Min Order Size':<18} | {get(grvt_rules, 'min_size'):<25} | {get(lighter_rules, 'min_size'):<25}")
-            print(f"{'Max Leverage':<18} | {get(grvt_rules, 'max_leverage'):<25} | {get(lighter_rules, 'max_leverage'):<25}")
-        print(f"{'Max Leverage':<18} | {get(grvt_rules, 'max_leverage'):<25} | {get(lighter_rules, 'max_leverage'):<25}")
+            grvt_rate_str = f"{color_rate(grvt_rate)} ({grvt_interval}h)"
+            lighter_rate_str = f"{color_rate(lighter_rate)} (1h -> {color_rate(norm_lighter_rate)})"
+            diff_str = color_rate(funding_diff)
 
-        print("\n" + "="*70)
+            recommendation = "N/A"
+            if funding_diff is not None:
+                if funding_diff > 0: # GRVT > Lighter, so Short GRVT, Long Lighter
+                    recommendation = f"{C.RED}Short GRVT{C.ENDC}/{C.GREEN}Long Lighter{C.ENDC}"
+                else: # Lighter > GRVT, so Long GRVT, Short Lighter
+                    recommendation = f"{C.GREEN}Long GRVT{C.ENDC}/{C.RED}Short Lighter{C.ENDC}"
+
+            row = (f"{symbol_base:<7} | {grvt_rate_str:<14} | {lighter_rate_str:<20} | {diff_str:>17} | {recommendation}")
+            print(row)
+        
+        print("="*78)
+
+        # Print Best Opportunity
+        if best_opportunity['symbol']:
+            sym = best_opportunity['symbol']
+            diff = best_opportunity['diff']
+            
+            if diff > 0:
+                strat_rec = f"{C.RED}Short GRVT{C.ENDC} / {C.GREEN}Long Lighter{C.ENDC}"
+            else:
+                strat_rec = f"{C.GREEN}Long GRVT{C.ENDC} / {C.RED}Short Lighter{C.ENDC}"
+
+            print(f"\n{C.BOLD}{C.YELLOW}Optimal Strategy Suggestion:{C.ENDC}")
+            print(f"  - Symbol: {C.BOLD}{sym}{C.ENDC}")
+            print(f"  - Max Funding Diff: {color_rate(diff)}")
+            print(f"  - Recommendation: {strat_rec}")
+        print("="*78)
 
     async def on_fill(self, fill_data):
         logger.info(f"Fill received: {fill_data}")

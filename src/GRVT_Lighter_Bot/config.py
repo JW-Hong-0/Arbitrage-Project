@@ -18,6 +18,14 @@ class Config:
         GRVT_PRIVATE_KEY = os.getenv("GRVT_MAINNET_SECRET_KEY")
         GRVT_TRADING_ACCOUNT_ID = os.getenv("GRVT_MAINNET_TRADING_ACCOUNT_ID")
 
+    # Validate essential GRVT credentials
+    if not GRVT_API_KEY:
+        raise ValueError(f"GRVT_API_KEY is not set for {GRVT_ENV} environment. Please check your .env file.")
+    if not GRVT_PRIVATE_KEY:
+        raise ValueError(f"GRVT_PRIVATE_KEY is not set for {GRVT_ENV} environment. Please check your .env file.")
+    if not GRVT_TRADING_ACCOUNT_ID:
+        raise ValueError(f"GRVT_TRADING_ACCOUNT_ID is not set for {GRVT_ENV} environment. Please check your .env file.")
+
     if LIGHTER_ENV == "TESTNET":
         LIGHTER_WALLET_ADDRESS = os.getenv("LIGHTER_TESTNET_WALLET_ADDRESS")
         LIGHTER_PRIVATE_KEY = os.getenv("LIGHTER_TESTNET_PRIVATE_KEY")
@@ -34,7 +42,8 @@ class Config:
     # Strategy Settings
     DRY_RUN = False # Set to FALSE for actual Testnet testing
     LIGHTER_AMOUNT_SCALAR = 10000 # 0.0001 ETH/BTC unit? specific to Lighter
-    SYMBOLS = ["ETH-USDT", "LIT-USDT"] # Multi-symbol support
+    SYMBOLS = ["ETH-USDT", "LIT-USDT", "XRP-USDT"] # Multi-symbol support
+    SYMBOL_EXCLUDE = ["AI16Z"] # Symbols to exclude from automatic discovery
     SYMBOL = "ETH-USDT" # Legacy/Default support
     ORDER_AMOUNT = 0.001
     MAX_POSITION = 0.1

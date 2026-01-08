@@ -63,4 +63,5 @@ SYMBOL_ALIASES = {
 SYMBOL_METADATA = {
     "ETH-USDT": {"min_qty": "0.0001", "max_leverage": "50"},
     "LIT-USDT": {"min_qty": "0.01", "max_leverage": "5"},
+    "XRP-USDT": {"min_qty": "1.00", "max_leverage": "20"},
 }
