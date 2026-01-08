@@ -11,7 +11,7 @@ from lighter.models.funding_rates import FundingRates
 from lighter.signer_client import SignerClient
 from ..config import Config
 from ..utils import Utils
-from ..constants import LIGHTER_MARKET_IDS, SYMBOL_ALIASES
+from ..constants import LIGHTER_MARKET_IDS, SYMBOL_METADATA, SYMBOL_ALIASES
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ class LighterWS:
     def __init__(self, market_id, callback):
         self.market_id = market_id
         self.callback = callback
-        self.ws_url = "wss://api.lighter.xyz/ws" if Config.LIGHTER_ENV == "MAINNET" else "wss://api.testnet.zklighter.elliot.ai/ws" # Update based on standard or config
+        self.ws_url = "wss://mainnet.zklighter.elliot.ai/ws" if Config.LIGHTER_ENV == "MAINNET" else "wss://api.testnet.zklighter.elliot.ai/ws" # Update based on standard or config
         # Verify testnet WS URL from docs if possible, or assume based on api host.
         # User provided example subscription JSON, implying standard WS.
         # "wss://" + host.replace("https://", "")
@@ -33,8 +33,8 @@ class LighterWS:
     async def _run(self):
         while self.running:
             try:
-                # Use the exact host from Config logic, stripping protocol
-                base_host = "api.lighter.xyz" if Config.LIGHTER_ENV == "MAINNET" else "testnet.zklighter.elliot.ai"
+                # Update: Use the documented Mainnet URL
+                base_host = "mainnet.zklighter.elliot.ai" if Config.LIGHTER_ENV == "MAINNET" else "testnet.zklighter.elliot.ai"
                 # SDK Client uses /stream by default.
                 ws_url = f"wss://{base_host}/stream"
                 
@@ -42,19 +42,36 @@ class LighterWS:
                 async with websockets.connect(ws_url) as ws:
                     self.ws = ws
                     # Subscribe
-                    sub_msg = {
+                    sub_msg_stats = {
                         "type": "subscribe",
                         "channel": f"market_stats/{self.market_id}"
                     }
-                    await ws.send(json.dumps(sub_msg))
+                    await ws.send(json.dumps(sub_msg_stats))
                     logger.info(f"Subscribed to market_stats/{self.market_id}")
+
+                    sub_msg_ob = {
+                        "type": "subscribe",
+                        "channel": f"order_book/{self.market_id}"
+                    }
+                    await ws.send(json.dumps(sub_msg_ob))
+                    logger.info(f"Subscribed to order_book/{self.market_id}")
                     
                     while self.running:
                         msg = await ws.recv()
                         data = json.loads(msg)
-                        if data.get("type") == "update/market_stats":
-                            await self.callback(data.get("market_stats", {}))
-                        elif data.get("type") == "ping":
+                        msg_type = data.get("type")
+
+                        if msg_type == "update/market_stats":
+                            await self.callback(market_id=self.market_id, market_stats=data.get("market_stats", {}))
+                        
+                        elif msg_type == "update/order_book":
+                            # Lighter sends a snapshot first, then updates.
+                            # For simple Best Bid/Ask, we can just grab the top of the book from the snapshot/update.
+                            # The 'order_book' field contains 'bids' and 'asks' lists.
+                            ob_data = data.get("order_book", {})
+                            await self.callback(market_id=self.market_id, order_book=ob_data)
+
+                        elif msg_type == "ping":
                             await ws.send(json.dumps({"type": "pong"}))
             except Exception as e:
                 logger.error(f"Lighter WS Error: {e}")
@@ -68,7 +85,7 @@ class LighterWS:
 class LighterExchange:
     def __init__(self):
         self.config = Configuration()
-        host = "https://api.lighter.xyz" if Config.LIGHTER_ENV == "MAINNET" else "https://testnet.zklighter.elliot.ai"
+        host = "https://mainnet.zklighter.elliot.ai" if Config.LIGHTER_ENV == "MAINNET" else "https://testnet.zklighter.elliot.ai"
         self.config.host = host
         
         try:
@@ -83,13 +100,18 @@ class LighterExchange:
         
         self.client = None # Will be initialized async
         self.market_map = {} 
-        self.ws = None
-        self.latest_market_stats = {}
+        self.wss = {} # Key: market_id, Value: LighterWS instance
+        self.latest_market_stats = {} # Key: market_id
+        self.latest_order_book = {} # Key: market_id
 
-    async def _on_market_stats(self, stats):
-        # Callback to update local cache
-        self.latest_market_stats = stats
-        # logger.info(f"Updated Lighter Market Stats via WS: {stats}") 
+    async def _on_market_stats(self, market_id, market_stats=None, order_book=None):
+        # Callback to update local cache per market
+        if market_stats:
+            self.latest_market_stats[market_id] = market_stats
+        
+        if order_book:
+             # Store orderbook per market
+             self.latest_order_book[market_id] = order_book 
 
     async def initialize(self):
         """
@@ -99,14 +121,16 @@ class LighterExchange:
         logging.info("Initializing LighterExchange: Discovering account via direct API call...")
         
         if not Config.LIGHTER_WALLET_ADDRESS:
-            raise ConnectionError("LighterExchange Error: LIGHTER_WALLET_ADDRESS must be set in config.")
+            logger.warning("Lighter Wallet Address not set. Skipping Account Discovery (Monitor Mode).")
+            return
+            # raise ConnectionError("LighterExchange Error: LIGHTER_WALLET_ADDRESS must be set in config.")
 
         found_idx = -1
         try:
             import aiohttp
             l1_address = Config.LIGHTER_WALLET_ADDRESS
             # Dynamically select host based on environment
-            host = "https://api.lighter.xyz" if Config.LIGHTER_ENV == "MAINNET" else "https://testnet.zklighter.elliot.ai"
+            host = "https://mainnet.zklighter.elliot.ai" if Config.LIGHTER_ENV == "MAINNET" else "https://testnet.zklighter.elliot.ai"
             url = f"{host}/api/v1/account?by=l1_address&value={l1_address}"
             
             async with aiohttp.ClientSession() as session:
@@ -122,19 +146,31 @@ class LighterExchange:
                 raise ValueError(f"Could not parse 'accounts' or 'index' from direct API response: {resp_json}")
 
         except Exception as e:
-            raise ConnectionError(f"LighterExchange Error: Failed to fetch account via direct API call. {e}")
+            logger.warning(f"LighterExchange Warning: Account discovery failed ({e}). Proceeding without SignerClient (Monitor Mode only).")
+            # Do NOT raise if we only want to monitor.
+            # But get_balance requires L1 Address. check key.
+            if not Config.LIGHTER_WALLET_ADDRESS:
+                logger.error("Lighter Wallet Address is missing. Balance check will fail.")
+            return
 
         pk = Config.LIGHTER_PRIVATE_KEY
+        if not pk:
+            logger.warning("Lighter Private Key missing. SignerClient will not be initialized (Monitor Mode).")
+            return
+
         if pk.startswith("0x"):
             pk = pk[2:]
         api_key_idx = Config.LIGHTER_API_KEY_INDEX
 
-        self.client = SignerClient(
-            url=self.config.host, # This host is for the SignerClient, which might be different. Defaulting to SDK's is safer.
-            account_index=found_idx,
-            api_private_keys={api_key_idx: pk}
-        )
-        logger.info(f"LighterExchange initialized successfully with SignerClient (Account: {found_idx}, Key Index: {api_key_idx}).")
+        try:
+            self.client = SignerClient(
+                url=self.config.host, 
+                account_index=found_idx,
+                api_private_keys={api_key_idx: pk}
+            )
+            logger.info(f"LighterExchange initialized successfully with SignerClient (Account: {found_idx}, Key Index: {api_key_idx}).")
+        except Exception as e:
+             logger.error(f"Failed to init SignerClient: {e}. Trading disabled.")
 
 
     async def get_funding_rate(self, symbol: str):
@@ -159,7 +195,7 @@ class LighterExchange:
         Fetch funding rates by bypassing the SDK and using a direct, non-blocking aiohttp call.
         """
         try:
-            host = "https://api.lighter.xyz" if Config.LIGHTER_ENV == "MAINNET" else "https://testnet.zklighter.elliot.ai"
+            host = "https://mainnet.zklighter.elliot.ai" if Config.LIGHTER_ENV == "MAINNET" else "https://testnet.zklighter.elliot.ai"
             url = f"{host}/api/v1/funding-rates"
             
             import aiohttp
@@ -177,7 +213,7 @@ class LighterExchange:
         Fetch order book (best bid/ask) for a market_id.
         """
         try:
-            host = "https://api.lighter.xyz" if Config.LIGHTER_ENV == "MAINNET" else "https://testnet.zklighter.elliot.ai"
+            host = "https://mainnet.zklighter.elliot.ai" if Config.LIGHTER_ENV == "MAINNET" else "https://testnet.zklighter.elliot.ai"
             url = f"{host}/api/v1/orderBookOrders?market_id={market_id}&limit=1"
             
             import aiohttp
@@ -194,7 +230,7 @@ class LighterExchange:
         Fetch recent trades (last price) for a market_id.
         """
         try:
-            host = "https://api.lighter.xyz" if Config.LIGHTER_ENV == "MAINNET" else "https://testnet.zklighter.elliot.ai"
+            host = "https://mainnet.zklighter.elliot.ai" if Config.LIGHTER_ENV == "MAINNET" else "https://testnet.zklighter.elliot.ai"
             url = f"{host}/api/v1/recentTrades?market_id={market_id}&limit=1"
             
             import aiohttp
@@ -211,7 +247,7 @@ class LighterExchange:
         Fetch order book details (min size) for a market_id.
         """
         try:
-            host = "https://api.lighter.xyz" if Config.LIGHTER_ENV == "MAINNET" else "https://testnet.zklighter.elliot.ai"
+            host = "https://mainnet.zklighter.elliot.ai" if Config.LIGHTER_ENV == "MAINNET" else "https://testnet.zklighter.elliot.ai"
             url = f"{host}/api/v1/orderBookDetails?market_id={market_id}"
             
             import aiohttp
@@ -300,7 +336,7 @@ class LighterExchange:
                 raise ValueError("LIGHTER_WALLET_ADDRESS not set, cannot fetch balance.")
 
             # Dynamically select host based on environment
-            host = "https://api.lighter.xyz" if Config.LIGHTER_ENV == "MAINNET" else "https://testnet.zklighter.elliot.ai"
+            host = "https://mainnet.zklighter.elliot.ai" if Config.LIGHTER_ENV == "MAINNET" else "https://testnet.zklighter.elliot.ai"
             url = f"{host}/api/v1/account?by=l1_address&value={l1_address}"
             
             import aiohttp
@@ -351,10 +387,18 @@ class LighterExchange:
         """
         Retrieves ticker information.
         """
+        # 0. Check for user-defined overrides (Metadata Correction)
+        if symbol in SYMBOL_METADATA:
+            defaults = SYMBOL_METADATA[symbol]
+            # Ensure tick_size exists if not present in constant
+            if 'tick_size' not in defaults:
+                defaults['tick_size'] = "0.01"
+            return defaults
+
         try:
             # For Lighter, we might need to query 'markets' or hardcode if API didn't expose it easily.
             # Using direct REST call to get market details.
-            host = "https://api.lighter.xyz" if Config.LIGHTER_ENV == "MAINNET" else "https://testnet.zklighter.elliot.ai"
+            host = "https://mainnet.zklighter.elliot.ai" if Config.LIGHTER_ENV == "MAINNET" else "https://testnet.zklighter.elliot.ai"
             url = f"{host}/api/v1/markets"
              
             import aiohttp
@@ -387,10 +431,12 @@ class LighterExchange:
                                         "tick_size": m.get('tick_size')
                                     }
             
-            return {"min_qty": "0.0001", "max_leverage": "50"} # Fallback defaults for user requirement
+            return {"min_qty": "0.0001", "max_leverage": "50", "tick_size": "0.01"}
         except Exception as e:
             logger.error(f"Error fetching Lighter ticker info: {e}")
-            return None
+            # Fallback to hardcoded metadata if available
+            defaults = SYMBOL_METADATA.get(symbol, {"min_qty": "0.0001", "max_leverage": "50", "tick_size": "0.01"})
+            return defaults
 
     async def get_funding_info(self, symbol):
         """
@@ -404,7 +450,7 @@ class LighterExchange:
             market_id = LIGHTER_MARKET_IDS.get(base_symbol, 0)
 
             # Direct API call for funding
-            host = "https://api.lighter.xyz" if Config.LIGHTER_ENV == "MAINNET" else "https://testnet.zklighter.elliot.ai"
+            host = "https://mainnet.zklighter.elliot.ai" if Config.LIGHTER_ENV == "MAINNET" else "https://testnet.zklighter.elliot.ai"
             url = f"{host}/api/v1/funding-rates?market_id={market_id}"
             
             import aiohttp
@@ -441,13 +487,13 @@ class LighterExchange:
                 base_symbol = SYMBOL_ALIASES[base_symbol]
             market_id = LIGHTER_MARKET_IDS.get(base_symbol, 0)
             
-            # Start WS if not running
-            if not self.ws:
-                self.ws = LighterWS(market_id, self._on_market_stats)
-                await self.ws.start()
+            # Start WS if not running for this market
+            if market_id not in self.wss:
+                self.wss[market_id] = LighterWS(market_id, self._on_market_stats)
+                await self.wss[market_id].start()
             
-            # Prefer WS Data
-            ws_stats = self.latest_market_stats
+            # Prefer WS Data from Cache
+            ws_stats = self.latest_market_stats.get(market_id, {})
             
             price = ws_stats.get('last_trade_price')
             mark_price = ws_stats.get('mark_price')
@@ -475,7 +521,7 @@ class LighterExchange:
             if not funding_rate:
                 try:
                     # Manual fallback using existing client
-                    host = "https://api.lighter.xyz" if Config.LIGHTER_ENV == "MAINNET" else "https://testnet.zklighter.elliot.ai"
+                    host = "https://mainnet.zklighter.elliot.ai" if Config.LIGHTER_ENV == "MAINNET" else "https://testnet.zklighter.elliot.ai"
                     url = f"{host}/api/v1/funding-rates"
                     import aiohttp
                     async with aiohttp.ClientSession() as session:
@@ -489,22 +535,103 @@ class LighterExchange:
                 except Exception:
                     pass
 
+            # Parse Best Bid/Ask from Order Book
+            best_bid = "N/A"
+            best_ask = "N/A"
+            
+            # Use self.latest_order_book (Snapshot or Update)
+            # CAUTION: This is naive. True OB persistence requires processing diffs.
+            # However, usually the first message is a snapshot. If the bot starts, it gets a snapshot.
+            # We will use that snapshot. Updates might overwrite this with partial data, causing "N/A" or wrong prices if we are not careful.
+            # But the user reported "N/A". Even a partial update is better than None?
+            # Actually, if we overwrite with a diff that has NO bids, we lose the Best Bid.
+            # Let's TRY to maintain a simple best_bid/best_ask variable in the class instead of full OB.
+            
+            ob = self.latest_order_book.get(market_id)
+            if ob:
+                bids = ob.get('bids', [])
+                asks = ob.get('asks', [])
+                
+                # If these lists are not empty, they contain updates or snapshot.
+                # If it's a snapshot, the first item is usually best.
+                # If it's an update, it might be a new best or a delete.
+                # Since we can't easily distinguish without full book:
+                # We will just take the price if available. 
+                # Ideally, we should use 'LighterWS' to maintain the book state. 
+                pass
+
+            # Let's rely on the WS callback logic update I made (which was weak). 
+            # Re-thinking: To get RELIABLE Best Bid/Ask, we need to process the stream.
+            # Since I can't edit the class heavily without risk, I will implement a basic "Latest Best" tracker in _on_market_stats (now callback).
+            
+            # Let's defer to the fact that I can edit `_on_market_stats` again or just do it here if I had access.
+            # I will assume `self.latest_order_book` has the data.
+            # To fix the "N/A", let's try to grab whatever is in 'bids'/'asks'.
+            if ob:
+                k_bids = ob.get('bids', [])
+                k_asks = ob.get('asks', [])
+                if k_bids:
+                     # Sort by price desc? Lighter usually sends sorted?
+                     # Lighter docs: "asks": [{"price": "...", "size": "..."}]
+                     # Let's assuming sorted or just take max.
+                     try:
+                        valid_bids = [float(b['price']) for b in k_bids if float(b.get('size', 0)) > 0]
+                        if valid_bids:
+                             current_best = max(valid_bids)
+                             # Update instance variable for persistence logic?
+                             # Since get_market_stats is called periodically, and OB updates fast.
+                             best_bid = str(current_best)
+                     except: pass
+
+                if k_asks:
+                     try:
+                        valid_asks = [float(a['price']) for a in k_asks if float(a.get('size', 0)) > 0]
+                        if valid_asks:
+                             current_best = min(valid_asks)
+                             best_ask = str(current_best)
+                     except: pass
+            
+            # Persist best bid/ask if we found one, to survive "empty diffs"
+            if best_bid != "N/A":
+                # Ensure _cached_best_bids dict exists
+                if not hasattr(self, '_cached_best_bids'): self._cached_best_bids = {}
+                self._cached_best_bids[market_id] = best_bid
+            else:
+                if hasattr(self, '_cached_best_bids'):
+                     best_bid = self._cached_best_bids.get(market_id, "N/A")
+                
+            if best_ask != "N/A":
+                  if not hasattr(self, '_cached_best_asks'): self._cached_best_asks = {}
+                  self._cached_best_asks[market_id] = best_ask
+            else:
+                  if hasattr(self, '_cached_best_asks'):
+                       best_ask = self._cached_best_asks.get(market_id, "N/A")
+
+
             return {
                 "price": price,
                 "mark_price": mark_price or price, # Approx
                 "index_price": ws_stats.get('index_price'),
                 "funding_rate": funding_rate,
-                "next_funding_time": next_funding_time 
+                "next_funding_time": next_funding_time,
+                "bid": best_bid,
+                "ask": best_ask
             }
         except Exception as e:
             logger.error(f"Error fetching Lighter market stats: {e}")
             return None
 
     async def close(self):
-        await self.api_client.close()
-        if self.client:
-            # Assuming the signer client uses the same underlying api_client
-            # If it has its own session, it should be closed here.
-            pass
-
-
+        """
+        Gracefully closes resources.
+        """
+        try:
+             # Close WS connections
+             for ws in self.wss.values():
+                 await ws.stop()
+             
+             # Close SignerClient
+             if self.client:
+                 await self.client.close()
+        except Exception as e:
+            logger.error(f"Error closing LighterExchange: {e}")

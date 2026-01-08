@@ -1,5 +1,6 @@
 import math
 from decimal import Decimal, ROUND_FLOOR
+from datetime import datetime
 
 class Utils:
     @staticmethod
@@ -50,3 +51,47 @@ class Utils:
         """
         if tick_size <= 0: return 0
         return int(round(-math.log10(tick_size), 0))
+
+    @staticmethod
+    def format_funding_rate(rate) -> str:
+        """
+        Formats funding rate string/float to 6 decimal string.
+        """
+        try:
+            if rate is None or rate == 'N/A':
+                return 'N/A'
+            val = float(rate)
+            return f"{val:.6f}"
+        except:
+            return 'N/A'
+
+    @staticmethod
+    def format_funding_time(ts) -> str:
+        """
+        Formats timestamp (ns or ms) to HH:MM string, assuming 1h funding.
+        User data showed GRVT: 1767830400000000000 (ns)
+        Lighter: 1767823200000 (ms)
+        """
+        try:
+            if ts is None or ts == 'N/A':
+                return 'N/A'
+            
+            ts_int = int(ts)
+            
+            # Identify unit by length
+            # ns > 10^18 (currently ~1.7e18)
+            # ms > 10^12 (currently ~1.7e12)
+            # s > 10^9
+            
+            # Normalize to seconds
+            if ts_int > 1e16: # Nanoseconds
+                ts_sec = ts_int / 1e9
+            elif ts_int > 1e11: # Milliseconds
+                ts_sec = ts_int / 1e3
+            else:
+                ts_sec = ts_int
+            
+            dt = datetime.fromtimestamp(ts_sec)
+            return dt.strftime("%Y-%m-%d %H:%M")
+        except:
+            return 'N/A'

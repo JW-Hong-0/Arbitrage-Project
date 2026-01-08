@@ -29,6 +29,7 @@ LIGHTER_MARKET_IDS = {
     "SUI": 87,
     "TAO": 88,
     "ZEC": 90,
+    "LIT": 120,
 }
 
 # GRVT Ticker Map (Base -> Instrument)
@@ -38,6 +39,7 @@ GRVT_TICKER_MAP = {
     "ETH": "ETH_USDT_Perp",
     "SOL": "SOL_USDT_Perp",
     "ZK": "ZK_USDT_Perp",
+    "LIT": "LIT_USDT_Perp",
     # Add others as needed
 }
 
@@ -54,4 +56,11 @@ SYMBOL_ALIASES = {
     "BTC": "WBTC",
     "KPEPE": "PEPE",
     "1000PEPE": "PEPE" 
+}
+
+# Symbol Specific Metadata (Fallback/Override)
+# Explicitly requested by user due to API data issues
+SYMBOL_METADATA = {
+    "ETH-USDT": {"min_qty": "0.0001", "max_leverage": "50"},
+    "LIT-USDT": {"min_qty": "0.01", "max_leverage": "5"},
 }

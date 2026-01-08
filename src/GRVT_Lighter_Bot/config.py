@@ -5,8 +5,8 @@ load_dotenv()
 
 class Config:
     # Environment Settings
-    GRVT_ENV = os.getenv("GRVT_ENV", "TESTNET")  # TESTNET or PROD
-    LIGHTER_ENV = os.getenv("LIGHTER_ENV", "TESTNET") # TESTNET or MAINNET
+    GRVT_ENV = os.getenv("GRVT_ENV", "PROD")  # TESTNET or PROD
+    LIGHTER_ENV = os.getenv("LIGHTER_ENV", "MAINNET") # TESTNET or MAINNET
     
     # Load keys based on Environment
     if GRVT_ENV == "TESTNET":
@@ -34,7 +34,8 @@ class Config:
     # Strategy Settings
     DRY_RUN = False # Set to FALSE for actual Testnet testing
     LIGHTER_AMOUNT_SCALAR = 10000 # 0.0001 ETH/BTC unit? specific to Lighter
-    SYMBOL = "ETH-USDT" # Valid symbol for both (mapped internally)
+    SYMBOLS = ["ETH-USDT", "LIT-USDT"] # Multi-symbol support
+    SYMBOL = "ETH-USDT" # Legacy/Default support
     ORDER_AMOUNT = 0.001
     MAX_POSITION = 0.1
     SPREAD_BPS = 5 # 0.05%
