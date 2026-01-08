@@ -1,0 +1,26 @@
+.md-typeset .admonition.brand-highlight,
+.md-typeset details.brand-highlight {
+    border-color: #448aff;
+}
+
+.md-typeset .brand-highlight>.admonition-title,
+.md-typeset .brand-highlight>summary {
+    background-color: transparent;
+}
+
+.md-typeset .brand-highlight>.admonition-title {
+    padding-left: .6rem;
+}
+
+.md-typeset .brand-highlight>.admonition-title::before,
+.md-typeset .brand-highlight>summary::before {
+    display: none;
+}
+
+.md-grid {
+    max-width: 2000px;
+}
+
+hr.solid {
+    border-bottom: 0.15rem solid var(--md-default-fg-color--lightest);
+}
