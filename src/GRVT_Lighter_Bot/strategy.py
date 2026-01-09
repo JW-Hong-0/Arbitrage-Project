@@ -42,6 +42,7 @@ class Strategy:
              lighter_rules = {
                  'min_size': lighter_info.get('min_qty', 'N/A') if lighter_info else 'N/A',
                  'max_leverage': lighter_info.get('max_leverage', 'N/A') if lighter_info else 'N/A',
+                 'current_leverage': lighter_info.get('current_leverage', 'N/A') if lighter_info else 'N/A',
              }
              
              self.trading_rules[symbol] = {'grvt': grvt_rules, 'lighter': lighter_rules}
