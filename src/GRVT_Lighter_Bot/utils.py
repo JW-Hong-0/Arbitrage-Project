@@ -25,6 +25,8 @@ class Utils:
         """
         Converts 'BTC-USDT' to 'BTC_USDT_Perp'
         """
+        if '_USDT_Perp' in symbol:
+            return symbol
         base = symbol.split('-')[0]
         return f"{base}_USDT_Perp"
 

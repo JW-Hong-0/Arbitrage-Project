@@ -166,6 +166,39 @@ Lighter: -0.001 BTC 숏 ($95.05, 슬리피지 0.05%)
 - Lighter 에어드랍 실제 지급
 - 슬리피지 관리 가능 (부분 청산 기능으로 개선)
 
+- 슬리피지 관리 가능 (부분 청산 기능으로 개선)
+
+### 2.5 기술적 타당성 검증 (Technical Validation)
+
+**2026년 1월 9일 Lighter Testnet 검증 결과**:
+
+| 항목 | 검증 내용 | 결과 | 비고 |
+| :--- | :--- | :--- | :--- |
+| **Lighter** | 레버리지 설정 (1x, 3x) | [Success] | API 정상 호출 |
+| **Lighter** | 시장가 매수 주문 | [Success] | API 정상 호출 |
+| **Lighter** | 시장가 정리 주문 | [Success] | Reduce-Only 기능 확인 |
+| **GRVT** | Ticker 조회 (최소수량) | [Success] | Min Qty 0.01 확인 |
+| **GRVT** | 레버리지 설정 (10x) | [Success] | 10x 설정 완료 |
+| **GRVT** | 지정가 주문 (Post-Only) | [Success] | Pending 상태 확인 |
+| **GRVT** | 주문 취소 | [Success] | 정상 취소 확인 |
+
+| **GRVT** | 메인넷 실전 주문 (XRP) | [Success] | Market Buy로 즉시 체결 및 포지션 생성 확인 (30 XRP) |
+| **GRVT** | 메인넷 웹소켓 연결 | [Success] | user.trades 구독 성공 |
+| **GRVT** | 포지션 파싱 및 정리 | [Success] | API 버그 수정 후 포지션 인식 및 전량 청산 완료 |
+| **Lighter** | 메인넷 실전 주문 (ETH) | [Success] | Market Buy (IOC) 체결 및 포지션 확인 (0.0001 ETH) |
+| **Lighter** | 메인넷 청산 (Close) | [Success] | Market Sell (Reduce-Only)로 전량 청산 완료 |
+
+* **검증 완료**: 양대 거래소(GRVT, Lighter) 모두 메인넷 환경에서 주문, 조회, 웹소켓, 청산 기능이 정상 작동함을 확인했습니다. 
+* **다음 단계**: 검증된 모듈을 통합하여 실제 차익거래 로직(Spread 감시 -> 진입 -> 청산)을 수행하는 메인 봇 개발.
+
+3.2 기술적 구현 사항 (Technical Solutions)
+- **[Lighter] 정수형 변환**: `supported_size_decimals`를 활용하여 수량/가격을 정수로 변환 전송.
+- **[Lighter] IOC 마켓 주문**: `order_expiry=0` 설정 및 Slippage 반영한 Limit Price 계산으로 시장가 효과 구현.
+- **[GRVT] Order ID 매핑**: SDK 응답 포맷(`order_id`)을 표준(`id`)에 맵핑하여 호환성 확보.
+- **[Common] 이모지 제거**: 시스템 호환성(Windows cp949)을 위해 로그에서 이모지 제거.
+
+4. 결론 및 향후 계획 (Conclusion & Next Steps)
+
 ---
 
 ## 3. 리스크 매트릭스 및 대응방안

@@ -89,8 +89,10 @@ async def main():
                 tx_hash = await lighter.place_market_order(symbol, 'buy', amount)
                 if tx_hash:
                     logger.info(f"✅ Market buy order submitted successfully. Response: {tx_hash}")
+                    print(f"✅ BUY Order Sent! Tx: {tx_hash}")
                 else:
                     logger.error("❌ Failed to place market buy order.")
+                    print("❌ Failed to place BUY order.")
 
             elif action == 'sell':
                 if len(parts) != 3:
@@ -102,8 +104,10 @@ async def main():
                 tx_hash = await lighter.place_market_order(symbol, 'sell', amount)
                 if tx_hash:
                     logger.info(f"✅ Market sell order submitted successfully. Response: {tx_hash}")
+                    print(f"✅ SELL Order Sent! Tx: {tx_hash}")
                 else:
                     logger.error("❌ Failed to place market sell order.")
+                    print("❌ Failed to place SELL order.")
 
             elif action == 'close':
                 if len(parts) != 4:
@@ -120,8 +124,10 @@ async def main():
                 tx_hash = await lighter.close_market_position(symbol, side, amount)
                 if tx_hash:
                     logger.info(f"✅ Close (reduce-only) order submitted successfully. Response: {tx_hash}")
+                    print(f"✅ CLOSE Order Sent! Tx: {tx_hash}")
                 else:
                     logger.error("❌ Failed to place close order.")
+                    print("❌ Failed to place CLOSE order.")
             else:
                 logger.warning(f"Unknown command: '{action}'. Type 'help' for options.")
 

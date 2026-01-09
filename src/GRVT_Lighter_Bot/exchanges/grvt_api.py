@@ -46,7 +46,7 @@ class GrvtExchange:
         logger.info("[GRVT] Attempting to load market rules...")
         available_symbols = set()
         if not self.client:
-            logger.error("❌ [GRVT] Aborting load_market_rules: client is not initialized.")
+            logger.error("[GRVT] Aborting load_market_rules: client is not initialized.")
             return available_symbols
 
         try:
@@ -61,7 +61,7 @@ class GrvtExchange:
                 logger.info(f"[GRVT] Explicit load_markets() response. Count: {len(markets_to_parse) if markets_to_parse else 0}")
 
             if not markets_to_parse:
-                logger.error("❌ [GRVT] No market data found in either .markets attribute or load_markets() call.")
+                logger.error("[GRVT] No market data found in either .markets attribute or load_markets() call.")
                 return available_symbols
 
             for symbol, market in markets_to_parse.items():
@@ -71,10 +71,10 @@ class GrvtExchange:
                     'min_size': market.get('min_size'), # Corrected based on user-provided API docs
                     'max_leverage': market.get('limits', {}).get('leverage', {}).get('max', 20),
                 }
-            logger.info(f"✅ [GRVT] {len(self.market_rules)} market rules loaded.")
+            logger.info(f"[GRVT] {len(self.market_rules)} market rules loaded.")
             logger.info(f"[GRVT] Loaded rule keys: {list(self.market_rules.keys())}")
         except Exception as e:
-            logger.error(f"❌ [GRVT] Failed to parse market rules: {e}", exc_info=True)
+            logger.error(f"[GRVT] Failed to parse market rules: {e}", exc_info=True)
         
         return available_symbols
 
@@ -110,7 +110,7 @@ class GrvtExchange:
             logger.error(f"Error fetching all GRVT tickers: {e}")
             return {}
 
-    async def place_limit_order(self, symbol: str, side: str, price: float, amount: float):
+    async def place_limit_order(self, symbol: str, side: str, price: float, amount: float, params: dict = None):
         try:
             grvt_symbol = Utils.to_grvt_symbol(symbol) # Convert symbol to GRVT format
             # Quantize amount
@@ -121,8 +121,10 @@ class GrvtExchange:
                 logger.error(f"Order amount too small after quantization: {amount} -> {quantized_amount}")
                 return None
 
-            # Added post_only to params
-            params = {'post_only': True}
+            # Default to post_only=True unless overridden
+            final_params = {'post_only': True}
+            if params:
+                final_params.update(params)
             
             order = await asyncio.to_thread(
                 self.client.create_order,
@@ -131,12 +133,22 @@ class GrvtExchange:
                 side,
                 quantized_amount,
                 price,
-                params
+                final_params
             )
+            
+            # Map order_id to id if missing
+            if order and 'order_id' in order and 'id' not in order:
+                order['id'] = order['order_id']
+
+            # Map order_id to id if missing
+            if order and 'order_id' in order and 'id' not in order:
+                order['id'] = order['order_id']
+
             logger.info(f"GRVT Order Placed: {order}")
             return order
         except Exception as e:
             logger.error(f"GRVT Order Failed: {e}", exc_info=True)
+            # Try to fetch open orders to see if it actually went through?
             return None
         
     async def place_market_order(self, symbol: str, side: str, amount: float):
@@ -156,7 +168,11 @@ class GrvtExchange:
                 None  # Price is None for market orders
             )
             logger.debug(f"Raw GRVT create_order response: {order}") # More specific debug log
-            if order and order.get('id'):
+            
+            if order and ('id' in order or 'order_id' in order):
+                if 'order_id' in order and 'id' not in order:
+                    order['id'] = order['order_id']
+                
                 logger.info(f"GRVT Market Order Placed: {order}")
                 return order
             else:
@@ -185,10 +201,10 @@ class GrvtExchange:
                 size = float(p.get('size') or p.get('contracts') or 0)
                 if size != 0:
                     active_positions.append({
-                        'symbol': p.get('symbol'),
+                        'symbol': p.get('symbol') or p.get('instrument'),
                         'size': size,
                         'side': 'long' if size > 0 else 'short',
-                        'entry_price': float(p.get('entry_price', 0))
+                        'entry_price': float(p.get('entry_price') or p.get('entryPrice') or 0)
                     })
             
             return {
@@ -310,16 +326,16 @@ class GrvtExchange:
                 resp = await asyncio.to_thread(self.client._auth_and_post, url, payload=payload)
                 
                 if resp.get('success'):
-                    logger.info(f"✅ Successfully set GRVT leverage for {grvt_symbol} to {leverage}x.")
+                    logger.info(f"Successfully set GRVT leverage for {grvt_symbol} to {leverage}x.")
                     return True
                 else:
-                    logger.error(f"❌ Failed to set GRVT leverage for {grvt_symbol}. Response: {resp}")
+                    logger.error(f"Failed to set GRVT leverage for {grvt_symbol}. Response: {resp}")
                     return False
             else:
-                logger.error("❌ Cannot set GRVT leverage: _auth_and_post method not found on client.")
+                logger.error("Cannot set GRVT leverage: _auth_and_post method not found on client.")
                 return False
         except Exception as e:
-            logger.error(f"❌ Error setting GRVT leverage for {symbol}: {e}", exc_info=True)
+            logger.error(f"Error setting GRVT leverage for {symbol}: {e}", exc_info=True)
             return False
 
     async def get_funding_interval(self, symbol: str) -> int | None:

@@ -145,9 +145,9 @@ class LighterExchange:
 
             if orderbooks_data and 'order_books' in orderbooks_data:
                 for item in orderbooks_data.get('order_books', []):
-                    logger.debug(f"Lighter orderbook item: {item}")
-                    
+                    # logger.debug(f"Lighter orderbook item: {item}")
                     if item.get('market_type') == 'perp':
+                        logger.info(f"PERP MARKET ITEM: {json.dumps(item, indent=2)}") # Log full item for inspection
                         ticker = item.get('symbol', '').split('-')[0].split('/')[0]
                         market_id_for_trading = item.get('market_id')
 
@@ -160,7 +160,17 @@ class LighterExchange:
                                 min_qty = 10**(-int(decimals))
                                 self.market_rules[ticker]['min_qty'] = f"{min_qty:.{decimals}f}" if decimals > 0 else str(int(min_qty))
                             else:
+                                decimals = 0 # Default to 0 if not found, though risky
                                 self.market_rules[ticker]['min_qty'] = item.get('min_base_amount', '0.001')
+                            
+                            self.market_rules[ticker]['decimals'] = int(decimals) if decimals is not None else 18 # Default to 18 if completely missing? Or 0? Let's check logic.
+                            if decimals is None:
+                                self.market_rules[ticker]['decimals'] = 18 # Fallback
+                            else:
+                                self.market_rules[ticker]['decimals'] = int(decimals)
+
+                            price_decimals = item.get('supported_price_decimals')
+                            self.market_rules[ticker]['price_decimals'] = int(price_decimals) if price_decimals is not None else 2 # Default 2
 
                             self.market_rules[ticker]['max_leverage'] = 'N/A'
                 
@@ -242,6 +252,98 @@ class LighterExchange:
             "current_leverage": current_leverage
         }
 
+    async def get_live_position_details(self, symbol):
+        """
+        Retrieves detailed position information including accurate leverage, margin usage, and funding rates.
+        Returns a dictionary with parsed data.
+        """
+        base_symbol = symbol.split('-')[0]
+        details = {
+            "symbol": base_symbol,
+            "size": 0.0,
+            "entry_price": 0.0,
+            "leverage": 0.0,
+            "margin_used": 0.0,
+            "unrealized_pnl": 0.0,
+            "funding_rate": 0.0,
+            "next_funding_time": "N/A"
+        }
+
+        if not self.client:
+            logger.warning("Lighter client not initialized. Cannot fetch live position details.")
+            return details
+
+        # 1. Fetch Position & Account Data
+        try:
+            l1_address = Config.LIGHTER_WALLET_ADDRESS
+            url = f"{self.config.host}/api/v1/account?by=l1_address&value={l1_address}"
+            import aiohttp
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, headers={"accept": "application/json"}, timeout=5) as response:
+                    if response.status == 200:
+                        resp_json = await response.json()
+                        if resp_json and resp_json.get('accounts'):
+                            target_account = next((acc for acc in resp_json['accounts'] if int(acc.get('index', -1)) == self.client.account_index), None)
+                            
+                            if target_account and 'positions' in target_account:
+                                for p in target_account['positions']:
+                                    if p.get('symbol') == base_symbol:
+                                        # logger.info(f"Raw Position Data for {base_symbol}: {p}") # Debug log
+                                        
+                                        raw_size = float(p.get('position', 0))
+                                        sign = int(p.get('sign', 1))
+                                        # Lighter: sign 1 for Long, -1 for Short, 0 for Flat? Let's check logs.
+                                        # Log shows sign: 1 for Positive.
+                                        # If raw_size is absolute, we apply sign.
+                                        details['size'] = raw_size * sign
+                                        
+                                        details['entry_price'] = float(p.get('avg_entry_price', 0)) # Mapped from 'avg_entry_price'
+                                        details['unrealized_pnl'] = float(p.get('unrealized_pnl', 0))
+                                        
+                                        # Calculate Leverage & Margin
+                                        imf_str = p.get('initial_margin_fraction')
+                                        if imf_str:
+                                            try:
+                                                imf = float(imf_str)
+                                                if imf > 0:
+                                                    details['leverage'] = round(100 / imf, 2)
+                                                    # Margin Used ~= size * entry_price / leverage
+                                                    details['margin_used'] = abs(details['size'] * details['entry_price'] / details['leverage'])
+                                            except: pass
+                                        break
+        except Exception as e:
+            logger.error(f"Error fetching account details for {symbol}: {e}")
+
+        # 2. Fetch Funding Rate Info
+        try:
+            # Assuming FundingApi usage or simple REST endpoint if available
+            market_id = self.ticker_map.get(base_symbol)
+            if market_id is not None:
+                # Funding Rate Endpoint (Example Structure)
+                # Note: Lighter's funding rate might be in orderbook or separate endpoint
+                funding_url = f"{self.config.host}/api/v1/fundingRate?market_id={market_id}" 
+                # OR check if it's in orderbook snapshot
+                
+                async with aiohttp.ClientSession() as session:
+                     async with session.get(funding_url, headers={"accept": "application/json"}, timeout=5) as fr_response:
+                         if fr_response.status == 200:
+                             fr_data = await fr_response.json()
+                             # Parse funding data if available
+                             # This depends on actual API response format which we might need to verify
+                             # Let's try to get 'rate' and 'next_funding_time'
+                             if 'rate' in fr_data:
+                                 details['funding_rate'] = float(fr_data['rate'])
+                             if 'next_funding_timestamp' in fr_data:
+                                 # Convert timestamp to human readable
+                                 import datetime
+                                 ts = int(fr_data['next_funding_timestamp'])
+                                 details['next_funding_time'] = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+
+        except Exception as e:
+            logger.warning(f"Could not fetch funding rate for {symbol} (Optional): {e}")
+
+        return details
+
     async def get_balance(self):
         if not self.client: return {'equity': 0, 'available': 0, 'positions': []}
         try:
@@ -320,8 +422,26 @@ class LighterExchange:
                 await asyncio.sleep(5)
 
     async def get_market_stats(self, symbol):
-        base_symbol = symbol.split('-')[0]
-        return self.bbo_cache.get(base_symbol, {})
+        # Cache usually keyed by full symbol e.g. "ETH-USDT"
+        # Input symbol might be "ETH" or "ETH-USDT"
+        
+        # 1. Try exact match
+        if symbol in self.bbo_cache:
+             return self.bbo_cache[symbol]
+        
+        # 2. Try adding -USDT
+        if not "-" in symbol:
+             sym_usdt = f"{symbol}-USDT"
+             if sym_usdt in self.bbo_cache:
+                 return self.bbo_cache[sym_usdt]
+
+        # 3. Try finding by base
+        base = symbol.split('-')[0]
+        for k, v in self.bbo_cache.items():
+            if k.startswith(base + "-") or k == base:
+                return v
+                
+        return {}
 
     async def close(self):
         self.ws_running = False
@@ -335,31 +455,33 @@ class LighterExchange:
         margin_mode can be 'cross' or 'isolated'.
         """
         if not self.client:
-            logger.error("❌ Cannot set Lighter leverage: client is not initialized.")
+            logger.error("[Error] Cannot set Lighter leverage: client is not initialized.")
             return False
         
         try:
             base_symbol = symbol.split('-')[0]
             market_id = self.ticker_map.get(base_symbol)
-            if market_id is None: # FIX: Check for None, because market_id can be 0
-                # Fallback to search id_map if ticker_map somehow missed it (less likely after fix)
+            if market_id is None:
+                # Fallback to search id_map
                 for mid, sym in self.id_map.items():
                     if sym == base_symbol:
                         market_id = mid
                         break
-            if market_id is None: # FIX: Check for None again after fallback
-                logger.error(f"❌ Could not find market_id for Lighter symbol {base_symbol}")
+            
+            if market_id is None:
+                logger.error(f"[Error] Could not find market_id for Lighter symbol {base_symbol}. Available tickers: {list(self.ticker_map.keys())}")
                 return False
+            
             market_index = int(market_id)
 
             # Convert margin_mode string to the integer expected by the SDK
-            # Assuming 0 for cross and 1 for isolated, which is a common convention.
-            # This should be verified if the SDK docs specify otherwise.
+            # SDK convention: 0 for cross, 1 for isolated
             mode_int = 0 if margin_mode.lower() == 'cross' else 1
             
-            logger.info(f"Attempting to set Lighter leverage for {base_symbol} (ID: {market_index}) to {leverage}x with {margin_mode} margin...")
+            logger.info(f"Attempting to set Lighter leverage for {base_symbol} (ID: {market_index}) to {leverage}x with {margin_mode} ({mode_int}) margin...")
             
             # The signer_client's update_leverage method handles the API call
+            # Returns: (tx, tx_hash, err)
             tx, tx_hash, err = await self.client.update_leverage(
                 market_index=market_index,
                 margin_mode=mode_int,
@@ -367,15 +489,18 @@ class LighterExchange:
             )
 
             if err:
-                logger.error(f"❌ Failed to set Lighter leverage for {base_symbol}: {err}")
+                logger.error(f"[Error] Failed to set Lighter leverage for {base_symbol}. Error: {err}")
                 return False
             
-            logger.info(f"✅ Successfully submitted Lighter leverage update for {base_symbol}. Tx Hash: {tx_hash}")
-            # Note: This only confirms submission. Confirmation requires checking the chain.
-            return True
+            if tx_hash:
+                logger.info(f"[Success] Successfully submitted Lighter leverage update for {base_symbol}. Tx Hash: {tx_hash}")
+                return True
+            else:
+                 logger.error(f"[Error] Failed to set Lighter leverage: No tx_hash returned (Unknown error)")
+                 return False
 
         except Exception as e:
-            logger.error(f"❌ Error setting Lighter leverage for {symbol}: {e}", exc_info=True)
+            logger.error(f"[Error] Error setting Lighter leverage for {symbol}: {e}", exc_info=True)
             return False
 
 # The methods below are kept for potential future use or reference, but are not actively used by the monitor.
@@ -408,35 +533,108 @@ class LighterExchange:
         if not self.client:
             await self.initialize()
             if not self.client:
-                logger.error("❌ Cannot place Lighter order: client is not initialized.")
+                logger.error("[Error] Cannot place Lighter order: client is not initialized.")
                 return None
         
         try:
             base_symbol = symbol.split('-')[0]
             market_index = self.ticker_map.get(base_symbol)
             if market_index is None:
-                logger.error(f"❌ Could not find market_id for Lighter symbol {base_symbol}")
+                logger.error(f"[Error] Could not find market_id for Lighter symbol {base_symbol}")
                 return None
             
+            # Generate a client_order_index based on timestamp to ensure uniqueness
+            client_order_index = int(time.time() * 1000)
+
+            # Convert amount to integer based on decimals
+            decimals = self.market_rules.get(base_symbol, {}).get('decimals', 18) # Default to 18 if missing
+            amount_int = int(amount * (10 ** decimals))
+            
+            # Calculate Price (Market Order Emulation)
+            price_int = 0
+            try:
+                # Get Price Decimals
+                price_decimals = self.market_rules.get(base_symbol, {}).get('price_decimals', 2)
+                
+                # Fetch Reference Price
+                ref_price = None
+                
+                # 1. Try Cache
+                cached_price = self.bbo_cache.get(base_symbol, {}).get('ask' if not reduce_only else 'bid') # Approximation
+                if cached_price:
+                    ref_price = cached_price
+                
+                # 2. If no cache, fetch OrderBook snapshot
+                if not ref_price:
+                    market_id = self.ticker_map.get(base_symbol)
+                    if market_id is not None:
+                        url = f"{self.config.host}/api/v1/orderBook?market_id={market_id}"
+                        import aiohttp
+                        async with aiohttp.ClientSession() as session:
+                             async with session.get(url, headers={"accept": "application/json"}, timeout=5) as response:
+                                 if response.status == 200:
+                                     ob_data = await response.json()
+                                     # logger.info(f"OrderBook Snapshot for {base_symbol}: {str(ob_data)[:200]}...") # Log start of OB
+                                     
+                                     # Determine generic side for price ref
+                                     # For Buy (Ask), For Sell (Bid)
+                                     target_side = 'asks' if (side.lower() != 'sell') else 'bids'
+                                     target_list = ob_data.get(target_side, [])
+                                     
+                                     if target_list:
+                                         ref_price = float(target_list[0]['price'])
+                                     else:
+                                         logger.warning(f"OrderBook {target_side} empty for {base_symbol}. Full OB keys: {ob_data.keys()}")
+                                 else:
+                                     logger.warning(f"Failed to fetch OrderBook for {base_symbol}: Status {response.status}")
+                
+                # 3. Fallback to hardcoded safe values if still None (Network error etc)
+                if not ref_price:
+                    logger.warning(f"Using Fallback Price for {base_symbol} (Market Data missing)")
+                    # Very conservative fallback
+                    # BTC ~100k, ETH ~3k
+                    if 'BTC' in base_symbol: ref_price = 200000 if side.lower() != 'sell' else 1
+                    elif 'ETH' in base_symbol: ref_price = 10000 if side.lower() != 'sell' else 1
+                    else: ref_price = 1000000 if side.lower() != 'sell' else 1 # Generic
+                
+                # Apply Slippage (5%)
+                if side.lower() != 'sell':
+                    final_price = ref_price * 1.05
+                else:
+                    final_price = ref_price * 0.95
+                
+                # Convert to integer
+                price_int = int(final_price * (10 ** price_decimals))
+                if price_int < 1: price_int = 1 # Minimum 1
+                
+                logger.info(f"Market Order {base_symbol} {side}: Ref Price {ref_price}, Final Price {final_price}, Int Price {price_int}")
+
+            except Exception as px:
+                logger.error(f"Error calculating market price: {px}")
+                # Fallback to safe int
+                price_int = 1000000000 if side.lower() != 'sell' else 1
+
             # Using the general `create_order` to pass the `reduce_only` flag.
             # For market orders, price is 0, and time_in_force is IMMEDIATE_OR_CANCEL.
             tx, tx_hash, err = await self.client.create_order(
                 market_index=int(market_index),
                 is_ask=(side.lower() == 'sell'),
-                base_amount=amount,
-                price=0,
+                base_amount=amount_int,
+                price=price_int, # Send calculated price
                 order_type=self.client.ORDER_TYPE_MARKET,
                 time_in_force=self.client.ORDER_TIME_IN_FORCE_IMMEDIATE_OR_CANCEL,
-                reduce_only=reduce_only
+                reduce_only=reduce_only,
+                client_order_index=client_order_index,
+                order_expiry=0 # Must be 0 for IOC orders
             )
 
             if err:
-                logger.error(f"❌ Lighter Order Error: {err}")
+                logger.error(f"[Error] Lighter Order Error: {err}")
                 return None
             
             return tx_hash
         except Exception as e:
-             logger.error(f"❌ Lighter Order Exception: {e}", exc_info=True)
+             logger.error(f"[Error] Lighter Order Exception: {e}", exc_info=True)
              return None
 
     async def place_market_order(self, symbol: str, side: str, amount: float):

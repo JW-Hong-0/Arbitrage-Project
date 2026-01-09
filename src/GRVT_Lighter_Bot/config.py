@@ -46,6 +46,7 @@ class Config:
     SYMBOL_EXCLUDE = ["AI16Z"] # Symbols to exclude from automatic discovery
     SYMBOL = "ETH-USDT" # Legacy/Default support
     ORDER_AMOUNT = 0.001
+    PER_TRADE_AMOUNT_USDT = 30.0 # Standard trade size in USD
     MAX_POSITION = 0.1
     SPREAD_BPS = 5 # 0.05%
     HEDGE_SLIPPAGE_BPS = 20 # 0.2%
@@ -53,6 +54,9 @@ class Config:
     
     # Funding Logic
     FUNDING_DIFF_THRESHOLD = 0.0001 # 0.01% difference to trigger
+    
+    # Dry Run Safety
+    MAX_ACTIVE_POSITIONS = 1
     
     # Logging
     LOG_LEVEL = "INFO"
